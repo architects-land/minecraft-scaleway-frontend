@@ -6,6 +6,7 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
+import org.replydev.mcping.MCPinger
 import java.util.Timer
 import java.util.logging.Level
 import java.util.logging.Logger

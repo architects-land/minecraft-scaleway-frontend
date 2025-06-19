@@ -9,6 +9,8 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -17,6 +19,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
     implementation("net.minestom:minestom-snapshots:e94aaed297")
+    implementation("com.github.replydev:mcping:1.0.2")
 }
 
 java {
