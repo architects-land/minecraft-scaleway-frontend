@@ -6,10 +6,14 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
+import java.util.Timer
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlin.concurrent.schedule
 
 val LOGGER: Logger = Logger.getLogger("MinecraftScalewayFrontend")
+
+val TIMER = Timer()
 
 fun main(args: Array<String>) {
     LOGGER.level = Level.INFO
@@ -44,6 +48,8 @@ fun main(args: Array<String>) {
 
     val instance = instanceManager.createInstanceContainer()
     val handler = MinecraftServer.getGlobalEventHandler()
+
+    var starting = false
     // spawn player
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         LOGGER.info("Player ${event.player.name} connected")
@@ -51,11 +57,21 @@ fun main(args: Array<String>) {
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
 
-        if (scaleway.serverState() == ScalewayAPI.ServerState.RUNNING) {
+        val state = scaleway.serverState()
+        if (state == ScalewayAPI.ServerState.RUNNING) {
             player.sendPacket(TransferPacket(
                 parser.get("minecraft-ip")!!,
                 parser.getIntOrDefault("minecraft-port", 25565)
             ))
+        } else if (state != ScalewayAPI.ServerState.STARTING && state != ScalewayAPI.ServerState.LOCKED) {
+            if (starting) return@addListener
+            starting = true
+            scaleway.startServer()
+            TIMER.schedule(10*60*1000L, 10*60*1000L) {
+                val state = scaleway.serverState()
+                if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
+                cancel()
+            }
         }
     }
 
