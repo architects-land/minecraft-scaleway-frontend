@@ -7,6 +7,8 @@ import net.minestom.server.event.player.PlayerChatEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
 import org.replydev.mcping.MCPinger
+import org.replydev.mcping.PingOptions
+import java.io.IOException
 import java.util.Timer
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -50,6 +52,13 @@ fun main(args: Array<String>) {
     val instance = instanceManager.createInstanceContainer()
     val handler = MinecraftServer.getGlobalEventHandler()
 
+    val option = PingOptions.builder()
+        .hostname(parser.get("minecraft-ip")!!)
+        .port(parser.getIntOrDefault("minecraft-port", 25565))
+        .timeout(1000)
+        .build()
+    val pinger = MCPinger.builder().pingOptions(option).build()
+
     var starting = false
     // spawn player
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
@@ -58,27 +67,40 @@ fun main(args: Array<String>) {
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
 
-        val state = scaleway.serverState()
-        if (state == ScalewayAPI.ServerState.RUNNING) {
-            player.sendPacket(TransferPacket(
-                parser.get("minecraft-ip")!!,
-                parser.getIntOrDefault("minecraft-port", 25565)
-            ))
-        } else if (state != ScalewayAPI.ServerState.STARTING && state != ScalewayAPI.ServerState.LOCKED) {
+        try {
+            pinger.fetchData()
+
+            player.sendPacket(TransferPacket(option.hostname, option.port))
+        } catch (_: IOException) {
             if (starting) return@addListener
             starting = true
+            val state = scaleway.serverState()
+            if (state == ScalewayAPI.ServerState.RUNNING || state == ScalewayAPI.ServerState.STARTING) {
+                LOGGER.warning("Server already running/starting")
+                return@addListener
+            } else if (state == ScalewayAPI.ServerState.LOCKED) {
+                LOGGER.warning("Server locked")
+                return@addListener
+            }
             scaleway.startServer()
             TIMER.schedule(10*60*1000L, 10*60*1000L) {
                 val state = scaleway.serverState()
                 if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
+                TIMER.schedule(5*60*1000L, 5*60*1000L) {
+                    try {
+                        pinger.fetchData()
+
+                        instance.players.forEach {
+                            it.sendPacket(TransferPacket(option.hostname, option.port))
+                        }
+                    } catch (_: IOException) {}
+                }
                 cancel()
             }
         }
     }
 
-    handler.addListener(
-        PlayerChatEvent::class.java
-    ) {
+    handler.addListener(PlayerChatEvent::class.java) {
         LOGGER.info(it.formattedMessage.toString())
     }
 
