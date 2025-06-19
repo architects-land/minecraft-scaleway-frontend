@@ -13,10 +13,12 @@ val LOGGER: Logger = Logger.getLogger("MinecraftScalewayFrontend")
 fun main(args: Array<String>) {
     LOGGER.level = Level.INFO
     LOGGER.info("Minecraft Scaleway Frontend launched")
+    val parser = ArgsParser(args)
+
     val server = MinecraftServer.init()
 
     // make server use online mode
-    MojangAuth.init();
+    MojangAuth.init()
 
     val instanceManager = MinecraftServer.getInstanceManager()
 
@@ -36,7 +38,6 @@ fun main(args: Array<String>) {
         LOGGER.info(it.formattedMessage.toString())
     }
 
-
     LOGGER.info("Minecraft Scaleway Frontend started")
-    server.start("0.0.0.0", 25565)
+    server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
 }
