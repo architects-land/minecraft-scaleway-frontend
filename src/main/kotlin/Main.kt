@@ -1,7 +1,6 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
@@ -29,7 +28,7 @@ fun main(args: Array<String>) {
     val parser = ArgsParser(args)
 
     if (!parser.has("zone")) {
-        LOGGER.severe("Specify zone of the server")
+        LOGGER.severe("Specify the zone of the server")
         return
     }
     if (!parser.has("server")) {
@@ -99,6 +98,7 @@ fun main(args: Array<String>) {
                         instance.players.forEach {
                             it.sendPacket(TransferPacket(option.hostname, option.port))
                         }
+                        cancel()
                     } catch (_: IOException) {}
                 }
                 cancel()
@@ -127,4 +127,6 @@ fun main(args: Array<String>) {
 
     LOGGER.info("Minecraft Scaleway Frontend started")
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
+
+    TIMER.cancel()
 }
