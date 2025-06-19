@@ -5,6 +5,7 @@ import net.minestom.server.coordinate.Pos
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
 import net.minestom.server.extras.MojangAuth
+import net.minestom.server.network.packet.server.common.TransferPacket
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -27,6 +28,10 @@ fun main(args: Array<String>) {
         LOGGER.severe("Specify the api key to use")
         return
     }
+    if (!parser.has("minecraft-ip")) {
+        LOGGER.severe("Specify the ip address of the minecraft server")
+        return
+    }
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
 
@@ -45,6 +50,13 @@ fun main(args: Array<String>) {
         val player = event.player
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
+
+        if (scaleway.serverState() == ScalewayAPI.ServerState.RUNNING) {
+            player.sendPacket(TransferPacket(
+                parser.get("minecraft-ip")!!,
+                parser.getIntOrDefault("minecraft-port", 25565)
+            ))
+        }
     }
 
     handler.addListener(

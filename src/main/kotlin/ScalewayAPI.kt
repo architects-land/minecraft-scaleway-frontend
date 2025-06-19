@@ -24,7 +24,7 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
 
     init {
         try {
-            serverStatus()
+            serverState()
         } catch (e: HttpErrorException) {
             throw IllegalArgumentException("Cannot connect to server $server in $zone with given apiKey", e)
         }
@@ -38,7 +38,7 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
         )
     }
 
-    fun serverStatus(): ServerState {
+    fun serverState(): ServerState {
         val resp = send(builder("https://api.scaleway.com/instance/v1/zones/$zone/servers/$server").GET().build())
         val serverResp = Json.decodeFromString(ServerResponse.serializer(), resp.body())
         return when (serverResp.server.state) {
@@ -48,7 +48,7 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
             "starting" -> ServerState.STARTING
             "stopping" -> ServerState.STOPPING
             "locked" -> ServerState.LOCKED
-            else -> throw HttpErrorException("Server state is not supported")
+            else -> throw HttpErrorException("Server state ${serverResp.server.state} is not supported")
         }
     }
 
