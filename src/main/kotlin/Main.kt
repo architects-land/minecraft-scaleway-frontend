@@ -1,15 +1,19 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
+import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
+import net.minestom.server.utils.identity.NamedAndIdentified
 import org.replydev.mcping.MCPinger
 import org.replydev.mcping.PingOptions
 import java.io.IOException
-import java.util.Timer
+import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.concurrent.schedule
@@ -102,6 +106,21 @@ fun main(args: Array<String>) {
 
     handler.addListener(PlayerChatEvent::class.java) {
         LOGGER.info(it.formattedMessage.toString())
+    }
+
+    handler.addListener(ServerListPingEvent::class.java) {
+        val respData = it.responseData
+        respData.clearEntries()
+        try {
+            val data = pinger.fetchData()
+            respData.description = Component.text("The server is running.")
+            data.players.sample.forEach { p ->
+                respData.addEntry(NamedAndIdentified.named(p.name))
+            }
+        } catch (_: IOException) {
+            respData.setPlayersHidden(true)
+            respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
+        }
     }
 
     LOGGER.info("Minecraft Scaleway Frontend started")
