@@ -18,6 +18,15 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
         }
     }
 
+    fun startServer(): Boolean {
+        val resp = send(
+            builder("/instance/v1/zones/$zone/servers/$server/action")
+            .POST(HttpRequest.BodyPublishers.ofString("{\"action\":\"poweron\"}"))
+            .build()
+        )
+        return resp.statusCode() in 200..299
+    }
+
     private fun builder(uri: String): HttpRequest.Builder {
         return HttpRequest.newBuilder()
             .uri(URI.create(uri))
