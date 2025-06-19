@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
+import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
 import net.minestom.server.event.server.ServerListPingEvent
@@ -70,6 +71,7 @@ fun main(args: Array<String>) {
         val player = event.player
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
+        player.gameMode = GameMode.SPECTATOR
 
         try {
             pinger.fetchData()
