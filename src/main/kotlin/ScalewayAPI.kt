@@ -1,7 +1,6 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.net.URI
 import java.net.http.HttpClient
@@ -13,6 +12,9 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
 
     @Serializable
     data class Server(val id: String, val name: String, val state: String)
+
+    @Serializable
+    data class ServerResponse(val server: Server)
 
     enum class ServerState {
         RUNNING, STOPPED, STOPPED_IN_PLACE, STARTING, STOPPING, LOCKED
@@ -38,8 +40,8 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
 
     fun serverStatus(): ServerState {
         val resp = send(builder("https://api.scaleway.com/instance/v1/zones/$zone/servers/$server").GET().build())
-        val server = Json.decodeFromString(Server.serializer(), resp.body())
-        return when (server.state) {
+        val serverResp = Json.decodeFromString(ServerResponse.serializer(), resp.body())
+        return when (serverResp.server.state) {
             "running" -> ServerState.RUNNING
             "stopped" -> ServerState.STOPPED
             "stopped in place" -> ServerState.STOPPED_IN_PLACE
