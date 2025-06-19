@@ -56,12 +56,12 @@ fun main(args: Array<String>) {
     val instance = instanceManager.createInstanceContainer()
     val handler = MinecraftServer.getGlobalEventHandler()
 
-    val option = PingOptions.builder()
+    val options = PingOptions.builder()
         .hostname(parser.get("minecraft-ip")!!)
         .port(parser.getIntOrDefault("minecraft-port", 25565))
         .timeout(1000)
         .build()
-    val pinger = MCPinger.builder().pingOptions(option).build()
+    val pinger = MCPinger.builder().pingOptions(options).build()
 
     var starting = false
     // spawn player
@@ -75,7 +75,7 @@ fun main(args: Array<String>) {
         try {
             pinger.fetchData()
 
-            player.sendPacket(TransferPacket(option.hostname, option.port))
+            player.sendPacket(TransferPacket(options.hostname, options.port))
         } catch (_: IOException) {
             if (starting) return@addListener
             starting = true
@@ -96,7 +96,7 @@ fun main(args: Array<String>) {
                         pinger.fetchData()
 
                         instance.players.forEach {
-                            it.sendPacket(TransferPacket(option.hostname, option.port))
+                            it.sendPacket(TransferPacket(options.hostname, options.port))
                         }
                         cancel()
                     } catch (_: IOException) {}
@@ -124,6 +124,10 @@ fun main(args: Array<String>) {
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
         }
     }
+
+    val commands = MinecraftServer.getCommandManager()
+    commands.register(InfoCommand(scaleway))
+    commands.register(ConnectCommand(pinger, options))
 
     LOGGER.info("Minecraft Scaleway Frontend started")
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
