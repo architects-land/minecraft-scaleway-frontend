@@ -15,6 +15,21 @@ fun main(args: Array<String>) {
     LOGGER.info("Minecraft Scaleway Frontend launched")
     val parser = ArgsParser(args)
 
+    if (!parser.has("zone")) {
+        LOGGER.severe("Specify zone of the server")
+        return
+    }
+    if (!parser.has("server")) {
+        LOGGER.severe("Specify the server")
+        return
+    }
+    if (!parser.has("api-key")) {
+        LOGGER.severe("Specify the api key to use")
+        return
+    }
+
+    val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
+
     val server = MinecraftServer.init()
 
     // make server use online mode

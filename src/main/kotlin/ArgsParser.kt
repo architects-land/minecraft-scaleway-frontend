@@ -27,6 +27,10 @@ class ArgsParser(val args: Array<String>) {
         return map[key] != null
     }
 
+    fun get(key: String): String? {
+        return map[key]
+    }
+
     fun getOrDefault(key: String, defaultValue: String): String {
         return map.getOrDefault(key, defaultValue)
     }
