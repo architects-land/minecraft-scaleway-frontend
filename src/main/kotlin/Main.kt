@@ -144,6 +144,4 @@ fun main(args: Array<String>) {
 
     LOGGER.info("Minecraft Scaleway Frontend started")
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
-
-    TIMER.cancel()
 }

@@ -32,7 +32,7 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
 
     fun startServer() {
         send(
-            builder("/instance/v1/zones/$zone/servers/$server/action")
+            builder("https://api.scaleway.com/instance/v1/zones/$zone/servers/$server/action")
             .POST(HttpRequest.BodyPublishers.ofString("{\"action\":\"poweron\"}"))
             .build()
         )
@@ -57,7 +57,7 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
         return HttpRequest.newBuilder()
             .uri(URI.create(uri))
             .setHeader("X-Auth-Token", apiKey)
-            .setHeader("ContentType", "application/json")
+            .setHeader("Content-Type", "application/json")
     }
 
     private fun send(request: HttpRequest): HttpResponse<String> {

@@ -28,6 +28,7 @@ class ConnectCommand(val pinger: MCPinger, val options: PingOptions) : Command("
 
                 sender.sendPacket(TransferPacket(options.hostname, options.port))
             } catch (e: IOException) {
+                e.printStackTrace()
                 sender.sendMessage("Cannot connect to the server (not started yet)")
             }
         }
