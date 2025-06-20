@@ -1,5 +1,6 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
+import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.minestom.server.MinecraftServer
@@ -15,6 +16,7 @@ import net.minestom.server.utils.identity.NamedAndIdentified
 import net.minestom.server.world.DimensionType
 import org.replydev.mcping.MCPinger
 import org.replydev.mcping.PingOptions
+import sun.misc.Signal
 import java.io.IOException
 import java.util.*
 import java.util.logging.Level
@@ -142,6 +144,16 @@ fun main(args: Array<String>) {
     commands.register(InfoCommand(scaleway))
     commands.register(ConnectCommand(pinger, options))
 
-    LOGGER.info("Minecraft Scaleway Frontend started")
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
+    LOGGER.info("Minecraft Scaleway Frontend started")
+
+    listOf("INT", "TERM").forEach { signalName ->
+        Signal.handle(Signal(signalName)) { signal ->
+            runBlocking {
+                LOGGER.info("Stopping...")
+                MinecraftServer.stopCleanly()
+                TIMER.cancel()
+            }
+        }
+    }
 }
