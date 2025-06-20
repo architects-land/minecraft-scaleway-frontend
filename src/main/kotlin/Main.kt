@@ -20,7 +20,7 @@ import kotlin.concurrent.schedule
 
 val LOGGER: Logger = Logger.getLogger("MinecraftScalewayFrontend")
 
-val TIMER = Timer()
+lateinit var TIMER: Timer
 
 fun main(args: Array<String>) {
     LOGGER.level = Level.INFO
@@ -43,6 +43,8 @@ fun main(args: Array<String>) {
         LOGGER.severe("Specify the ip address of the minecraft server")
         return
     }
+
+    TIMER =  Timer()
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
 

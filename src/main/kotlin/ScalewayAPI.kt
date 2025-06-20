@@ -40,7 +40,8 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
 
     fun serverState(): ServerState {
         val resp = send(builder("https://api.scaleway.com/instance/v1/zones/$zone/servers/$server").GET().build())
-        val serverResp = Json.decodeFromString(ServerResponse.serializer(), resp.body())
+        val decoder = Json { ignoreUnknownKeys = true }
+        val serverResp = decoder.decodeFromString(ServerResponse.serializer(), resp.body())
         return when (serverResp.server.state) {
             "running" -> ServerState.RUNNING
             "stopped" -> ServerState.STOPPED
@@ -62,6 +63,7 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
     private fun send(request: HttpRequest): HttpResponse<String> {
         val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
         if (resp.statusCode() >= 400) {
+            LOGGER.info(resp.body())
             throw HttpErrorException("Invalid server response status code: ${resp.statusCode()}")
         }
         return resp
