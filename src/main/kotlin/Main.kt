@@ -12,6 +12,7 @@ import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
 import net.minestom.server.utils.identity.NamedAndIdentified
+import net.minestom.server.world.DimensionType
 import org.replydev.mcping.MCPinger
 import org.replydev.mcping.PingOptions
 import java.io.IOException
@@ -57,7 +58,7 @@ fun main(args: Array<String>) {
 
     val instanceManager = MinecraftServer.getInstanceManager()
 
-    val instance = instanceManager.createInstanceContainer()
+    val instance = instanceManager.createInstanceContainer(DimensionType.THE_END)
 
     val handler = MinecraftServer.getGlobalEventHandler()
 
