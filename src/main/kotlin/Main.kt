@@ -1,11 +1,13 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
+import net.minestom.server.event.player.PlayerCommandEvent
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
@@ -56,6 +58,7 @@ fun main(args: Array<String>) {
     val instanceManager = MinecraftServer.getInstanceManager()
 
     val instance = instanceManager.createInstanceContainer()
+
     val handler = MinecraftServer.getGlobalEventHandler()
 
     val options = PingOptions.builder()
@@ -68,8 +71,9 @@ fun main(args: Array<String>) {
     var starting = false
     // spawn player
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
-        LOGGER.info("Player ${event.player.name} connected")
         val player = event.player
+        val playerName = PlainTextComponentSerializer.plainText().serialize(player.name)
+        LOGGER.info("Player $playerName (${player.uuid}) connected")
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
         player.gameMode = GameMode.SPECTATOR
@@ -109,7 +113,8 @@ fun main(args: Array<String>) {
     }
 
     handler.addListener(PlayerChatEvent::class.java) {
-        LOGGER.info(it.formattedMessage.toString())
+        val playerName = PlainTextComponentSerializer.plainText().serialize(it.player.name)
+        LOGGER.info("<$playerName> ${it.rawMessage}")
     }
 
     handler.addListener(ServerListPingEvent::class.java) {
@@ -125,6 +130,11 @@ fun main(args: Array<String>) {
             respData.setPlayersHidden(true)
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
         }
+    }
+
+    handler.addListener(PlayerCommandEvent::class.java) {
+        val playerName = PlainTextComponentSerializer.plainText().serialize(it.player.name)
+        LOGGER.info("$playerName: /${it.command}")
     }
 
     val commands = MinecraftServer.getCommandManager()
