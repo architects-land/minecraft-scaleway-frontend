@@ -8,11 +8,7 @@ import net.lenni0451.mcping.responses.MCPingResponse
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
-import net.minestom.server.event.player.PlayerChatEvent
-import net.minestom.server.event.player.PlayerCommandEvent
-import net.minestom.server.event.player.PlayerDisconnectEvent
-import net.minestom.server.event.player.PlayerSpawnEvent
+import net.minestom.server.event.player.*
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.instance.InstanceContainer
@@ -21,7 +17,7 @@ import net.minestom.server.utils.identity.NamedAndIdentified
 import net.minestom.server.world.DimensionType
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import org.apache.logging.log4j.message.Message
+import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
 import java.util.*
 import kotlin.concurrent.schedule
@@ -76,11 +72,8 @@ fun main(args: Array<String>) {
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
         LOGGER.info {
-            "Hello" as Message
-        }
-        LOGGER.info {
             val name = PlainTextComponentSerializer.plainText().serialize(player.name)
-            "Player $name (${player.uuid}) connected"
+            ParameterizedMessage("Player {} ({}) connected", name, player.uuid)
         }
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
@@ -102,7 +95,7 @@ fun main(args: Array<String>) {
         }.responseHandler {
             LOGGER.info {
                 val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
-                "Player $name (${event.player.uuid}) transferred to the Minecraft server"
+                ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, player.uuid)
             }
             player.sendPacket(TransferPacket(hostname, port))
         }.sync
@@ -111,7 +104,7 @@ fun main(args: Array<String>) {
     handler.addListener(PlayerDisconnectEvent::class.java) { event ->
         LOGGER.info {
             val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
-            "Player $name (${event.player.uuid}) disconnected"
+            ParameterizedMessage("Player {} ({}) disconnected", name, event.player.uuid)
         }
     }
 
@@ -151,6 +144,7 @@ fun main(args: Array<String>) {
                 LOGGER.info("Stopping...")
                 MinecraftServer.stopCleanly()
                 TIMER.cancel()
+                LOGGER.info("Stopped")
             }
         }
     }
@@ -179,12 +173,12 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
 fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
     TIMER.schedule(5*1000L, 5*1000L) {
         pinger().exceptionHandler {
-            LOGGER.info("Minecraft server is still starting... Current information: ${it.message}")
+            LOGGER.info("Assuming that the Minecraft server is still starting...", it)
         }.responseHandler {
             instance.players.forEach {
                 LOGGER.info {
                     val name = PlainTextComponentSerializer.plainText().serialize(it.name)
-                    "Sending $name (${it.uuid}) to the server"
+                    ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, it.uuid)
                 }
                 it.sendPacket(TransferPacket(hostname, port))
             }
