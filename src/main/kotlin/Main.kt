@@ -19,35 +19,35 @@ import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.network.packet.server.common.TransferPacket
 import net.minestom.server.utils.identity.NamedAndIdentified
 import net.minestom.server.world.DimensionType
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.message.Message
 import sun.misc.Signal
 import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
 import kotlin.concurrent.schedule
 
-val LOGGER: Logger = Logger.getLogger("MinecraftScalewayFrontend")
+val LOGGER: Logger = LogManager.getLogger("world.anhgelus.world.architectsland.minecraftscalewayfrontend")
 
 lateinit var TIMER: Timer
 
 fun main(args: Array<String>) {
-    LOGGER.level = Level.INFO
     LOGGER.info("Minecraft Scaleway Frontend launched")
     val parser = ArgsParser(args)
 
     if (!parser.has("zone")) {
-        LOGGER.severe("Specify the zone of the server")
+        LOGGER.error("Specify the zone of the server")
         return
     }
     if (!parser.has("server")) {
-        LOGGER.severe("Specify the server")
+        LOGGER.error("Specify the server")
         return
     }
     if (!parser.has("api-key")) {
-        LOGGER.severe("Specify the api key to use")
+        LOGGER.error("Specify the api key to use")
         return
     }
     if (!parser.has("minecraft-host")) {
-        LOGGER.severe("Specify the ip address of the minecraft server")
+        LOGGER.error("Specify the ip address of the minecraft server")
         return
     }
 
@@ -76,6 +76,9 @@ fun main(args: Array<String>) {
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
         LOGGER.info {
+            "Hello" as Message
+        }
+        LOGGER.info {
             val name = PlainTextComponentSerializer.plainText().serialize(player.name)
             "Player $name (${player.uuid}) connected"
         }
@@ -92,7 +95,7 @@ fun main(args: Array<String>) {
                 player.sendMessage(Component.text("The server is already starting..."))
                 return@exceptionHandler
             } else if (state == ScalewayAPI.ServerState.LOCKED) {
-                LOGGER.warning("Server locked")
+                LOGGER.warn("Server locked")
                 return@exceptionHandler
             }
             startServer(scaleway, pinger, instance, hostname, port)
