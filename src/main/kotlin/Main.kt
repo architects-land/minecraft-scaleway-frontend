@@ -114,7 +114,7 @@ fun main(args: Array<String>) {
 
     handler.addListener(PlayerChatEvent::class.java) {
         val playerName = PlainTextComponentSerializer.plainText().serialize(it.player.name)
-        LOGGER.info("<$playerName> ${it.rawMessage}")
+        LOGGER.info("<{}> {}", playerName, it.rawMessage)
     }
 
     handler.addListener(ServerListPingEvent::class.java) {
@@ -132,7 +132,7 @@ fun main(args: Array<String>) {
 
     handler.addListener(PlayerCommandEvent::class.java) {
         val playerName = PlainTextComponentSerializer.plainText().serialize(it.player.name)
-        LOGGER.info("$playerName: /${it.command}")
+        LOGGER.info("{}: /{}", playerName, it.command)
     }
 
     val commands = MinecraftServer.getCommandManager()
