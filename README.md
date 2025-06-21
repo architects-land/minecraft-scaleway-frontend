@@ -23,3 +23,4 @@ of the Minecraft server (default: 25565).
 - Gradle (Kotlin DSL)
 - kotlinx-serialization-json
 - kotlinx-coroutine-core
+- Log4J 2

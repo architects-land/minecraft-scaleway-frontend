@@ -26,6 +26,8 @@ val LOGGER: Logger = LogManager.getLogger("world.anhgelus.world.architectsland.m
 
 lateinit var TIMER: Timer
 
+private var powerOffTask: TimerTask? = null
+
 fun main(args: Array<String>) {
     LOGGER.info("Minecraft Scaleway Frontend launched")
     val parser = ArgsParser(args)
@@ -90,6 +92,9 @@ fun main(args: Array<String>) {
             } else if (state == ScalewayAPI.ServerState.LOCKED) {
                 LOGGER.warn("Server locked")
                 return@exceptionHandler
+            } else if (state == ScalewayAPI.ServerState.STOPPED_IN_PLACE) {
+                LOGGER.info("Server were stopped in place, restarting it")
+                powerOffTask?.cancel()
             }
             startServer(scaleway, pinger, instance, hostname, port)
         }.responseHandler {
@@ -188,11 +193,15 @@ fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: Instance
 }
 
 fun setupServerPowerOff(scaleway: ScalewayAPI) {
-    TIMER.schedule(2*60*1000L, 30*1000L) {
-        val state = scaleway.serverState()
-        if (state != ScalewayAPI.ServerState.STOPPED_IN_PLACE) return@schedule
-        LOGGER.info("Powering off server (state: $state)")
-        scaleway.powerOffServer()
-        cancel()
+    powerOffTask?.cancel()
+    powerOffTask = object : TimerTask() {
+        override fun run() {
+            val state = scaleway.serverState()
+            if (state != ScalewayAPI.ServerState.STOPPED_IN_PLACE) return
+            LOGGER.info("Powering off server (state: $state)")
+            scaleway.powerOffServer()
+            cancel()
+        }
     }
+    TIMER.schedule(powerOffTask, 2*60*1000L, 30*1000L)
 }
