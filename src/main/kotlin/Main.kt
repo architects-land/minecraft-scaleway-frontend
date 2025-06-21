@@ -11,6 +11,8 @@ import net.minestom.server.entity.GameMode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerChatEvent
 import net.minestom.server.event.player.PlayerCommandEvent
+import net.minestom.server.event.player.PlayerDisconnectEvent
+import net.minestom.server.event.player.PlayerSpawnEvent
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
@@ -55,8 +57,8 @@ fun main(args: Array<String>) {
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
 
-    MinecraftServer.setBrandName("Architects Land - Lobby")
     val server = MinecraftServer.init()
+    MinecraftServer.setBrandName("Architects Land - Lobby")
 
     // make server use online mode
     MojangAuth.init()
@@ -85,14 +87,13 @@ fun main(args: Array<String>) {
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
         player.gameMode = GameMode.SPECTATOR
+    }
 
+    handler.addListener(PlayerSpawnEvent::class.java) { event ->
+        val player = event.player
         try {
             pinger.fetchData()
 
-            LOGGER.info {
-                val name = PlainTextComponentSerializer.plainText().serialize(player.name)
-                "Sending $name (${player.uuid}) to the server"
-            }
             player.sendPacket(TransferPacket(options.hostname, options.port))
         } catch (_: IOException) {
             if (starting) {
@@ -132,6 +133,13 @@ fun main(args: Array<String>) {
                 }
                 cancel()
             }
+        }
+    }
+
+    handler.addListener(PlayerDisconnectEvent::class.java) { event ->
+        LOGGER.info {
+            val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
+            "Player $name (${event.player.uuid}) disconnected"
         }
     }
 
