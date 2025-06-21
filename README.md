@@ -1,6 +1,6 @@
 # Minecraft Scaleway Frontend
 
-Fake Minecraft Server used as a frontend to hourly paied Scaleway servers
+Fake Minecraft Server used as a frontend to hourly paid Scaleway servers
 
 ## Usage
 
@@ -18,4 +18,8 @@ of the Minecraft server (default: 25565).
 
 ## Technology
 
-Use Minestom
+- Minestom
+- Kotlin
+- Gradle (Kotlin DSL)
+- kotlinx-serialization-json
+- kotlinx-coroutine-core
