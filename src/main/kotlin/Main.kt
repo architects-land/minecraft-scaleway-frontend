@@ -70,7 +70,6 @@ fun main(args: Array<String>) {
 
     val pinger = { MCPing.pingModern().address(hostname, port).timeout(500, 500) }
 
-    // spawn player
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
         LOGGER.info {
@@ -176,7 +175,7 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
 }
 
 fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
-    TIMER.schedule(5*1000L, 5*1000L) {
+    TIMER.schedule(15*1000L, 5*1000L) {
         pinger().exceptionHandler {
             LOGGER.info("Assuming that the Minecraft server is still starting...", it)
         }.responseHandler {
