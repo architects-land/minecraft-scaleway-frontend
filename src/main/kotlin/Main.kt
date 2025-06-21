@@ -70,7 +70,7 @@ fun main(args: Array<String>) {
     val hostname = parser.get("minecraft-host")!!
     val port = parser.getIntOrDefault("minecraft-port", 25565)
 
-    val pinger = { MCPing.pingModern().address(hostname, port) }
+    val pinger = { MCPing.pingModern().address(hostname, port).timeout(500, 500) }
 
     var starting = false
     // spawn player
@@ -158,13 +158,18 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
     LOGGER.info("Starting the server")
     instance.players.forEach { it.sendMessage(Component.text("Starting the server for you...")) }
     scaleway.startServer()
-    TIMER.schedule(10*60*1000L, 10*60*1000L) {
+    TIMER.schedule(10*1000L, 10*1000L) {
         val state = scaleway.serverState()
-        if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
+        if (state != ScalewayAPI.ServerState.RUNNING) {
+            LOGGER.info("Server is still starting...")
+            return@schedule
+        }
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
-        TIMER.schedule(5*60*1000L, 5*60*1000L) {
-            pinger().exceptionHandler {}.responseHandler {
+        TIMER.schedule(5*1000L, 5*1000L) {
+            pinger().exceptionHandler {
+                LOGGER.info("Minecraft server is still starting...")
+            }.responseHandler {
                 instance.players.forEach {
                     LOGGER.info {
                         val name = PlainTextComponentSerializer.plainText().serialize(it.name)
