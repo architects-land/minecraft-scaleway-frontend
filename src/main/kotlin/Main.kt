@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.lenni0451.mcping.MCPing
+import net.lenni0451.mcping.responses.MCPingResponse
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
@@ -14,6 +15,7 @@ import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.event.player.PlayerSpawnEvent
 import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
+import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.network.packet.server.common.TransferPacket
 import net.minestom.server.utils.identity.NamedAndIdentified
 import net.minestom.server.world.DimensionType
@@ -99,28 +101,7 @@ fun main(args: Array<String>) {
                 LOGGER.warning("Server locked")
                 return@exceptionHandler
             }
-            LOGGER.info("Starting the server")
-            player.sendMessage(Component.text("Starting the server for you..."))
-            scaleway.startServer()
-            TIMER.schedule(10*60*1000L, 10*60*1000L) {
-                val state = scaleway.serverState()
-                if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
-                LOGGER.info("Server started, waiting for the Minecraft server")
-//                player.sendMessage(Component.text("Waiting for the Minecraft server..."))
-                TIMER.schedule(5*60*1000L, 5*60*1000L) {
-                    pinger().exceptionHandler {}.responseHandler {
-                        instance.players.forEach {
-                            LOGGER.info {
-                                val name = PlainTextComponentSerializer.plainText().serialize(it.name)
-                                "Sending $name (${it.uuid}) to the server"
-                            }
-                            it.sendPacket(TransferPacket(hostname, port))
-                        }
-                        cancel()
-                    }.sync
-                }
-                cancel()
-            }
+            startServer(scaleway, pinger, instance, hostname, port)
         }.responseHandler {
             player.sendPacket(TransferPacket(hostname, port))
         }.sync
@@ -170,5 +151,30 @@ fun main(args: Array<String>) {
                 TIMER.cancel()
             }
         }
+    }
+}
+
+fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
+    LOGGER.info("Starting the server")
+    instance.players.forEach { it.sendMessage(Component.text("Starting the server for you...")) }
+    scaleway.startServer()
+    TIMER.schedule(10*60*1000L, 10*60*1000L) {
+        val state = scaleway.serverState()
+        if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
+        LOGGER.info("Server started, waiting for the Minecraft server")
+        instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
+        TIMER.schedule(5*60*1000L, 5*60*1000L) {
+            pinger().exceptionHandler {}.responseHandler {
+                instance.players.forEach {
+                    LOGGER.info {
+                        val name = PlainTextComponentSerializer.plainText().serialize(it.name)
+                        "Sending $name (${it.uuid}) to the server"
+                    }
+                    it.sendPacket(TransferPacket(hostname, port))
+                }
+                cancel()
+            }.sync
+        }
+        cancel()
     }
 }
