@@ -72,7 +72,6 @@ fun main(args: Array<String>) {
 
     val pinger = { MCPing.pingModern().address(hostname, port).timeout(500, 500) }
 
-    var starting = false
     // spawn player
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
@@ -88,14 +87,9 @@ fun main(args: Array<String>) {
     handler.addListener(PlayerSpawnEvent::class.java) { event ->
         val player = event.player
         pinger().exceptionHandler {
-            if (starting) {
-                player.sendMessage(Component.text("The server is already starting..."))
-                return@exceptionHandler
-            }
-            starting = true
             val state = scaleway.serverState()
             if (state == ScalewayAPI.ServerState.RUNNING || state == ScalewayAPI.ServerState.STARTING) {
-                LOGGER.warning("Server already running/starting")
+                player.sendMessage(Component.text("The server is already starting..."))
                 return@exceptionHandler
             } else if (state == ScalewayAPI.ServerState.LOCKED) {
                 LOGGER.warning("Server locked")
@@ -180,6 +174,17 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
                 cancel()
             }.sync
         }
+        setupServerPowerOff(scaleway)
+        cancel()
+    }
+}
+
+fun setupServerPowerOff(scaleway: ScalewayAPI) {
+    TIMER.schedule(2*60*1000L, 30*1000L) {
+        val state = scaleway.serverState()
+        if (state != ScalewayAPI.ServerState.STOPPED_IN_PLACE) return@schedule
+        LOGGER.info("Powering off server (state: $state)")
+        scaleway.powerOffServer()
         cancel()
     }
 }
