@@ -161,14 +161,14 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
     TIMER.schedule(10*1000L, 10*1000L) {
         val state = scaleway.serverState()
         if (state != ScalewayAPI.ServerState.RUNNING) {
-            LOGGER.info("Server is still starting...")
+            LOGGER.info("Server is still starting... Current state: $state")
             return@schedule
         }
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
         TIMER.schedule(5*1000L, 5*1000L) {
             pinger().exceptionHandler {
-                LOGGER.info("Minecraft server is still starting...")
+                LOGGER.info("Minecraft server is still starting... Current information: ${it.message}")
             }.responseHandler {
                 instance.players.forEach {
                     LOGGER.info {
