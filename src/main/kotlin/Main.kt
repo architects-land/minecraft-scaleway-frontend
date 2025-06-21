@@ -1,10 +1,9 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import net.kyori.adventure.chat.ChatType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import net.lenni0451.mcping.MCPing
 import net.minestom.server.MinecraftServer
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.GameMode
@@ -18,10 +17,7 @@ import net.minestom.server.extras.MojangAuth
 import net.minestom.server.network.packet.server.common.TransferPacket
 import net.minestom.server.utils.identity.NamedAndIdentified
 import net.minestom.server.world.DimensionType
-import org.replydev.mcping.MCPinger
-import org.replydev.mcping.PingOptions
 import sun.misc.Signal
-import java.io.IOException
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -69,12 +65,10 @@ fun main(args: Array<String>) {
 
     val handler = MinecraftServer.getGlobalEventHandler()
 
-    val options = PingOptions.builder()
-        .hostname(parser.get("minecraft-ip")!!)
-        .port(parser.getIntOrDefault("minecraft-port", 25565))
-        .timeout(1000)
-        .build()
-    val pinger = MCPinger.builder().pingOptions(options).build()
+    val hostname = parser.get("minecraft-ip")!!
+    val port = parser.getIntOrDefault("minecraft-port", 25565)
+
+    val pinger = { MCPing.pingModern().address(hostname, port) }
 
     var starting = false
     // spawn player
@@ -91,23 +85,19 @@ fun main(args: Array<String>) {
 
     handler.addListener(PlayerSpawnEvent::class.java) { event ->
         val player = event.player
-        try {
-            pinger.fetchData()
-
-            player.sendPacket(TransferPacket(options.hostname, options.port))
-        } catch (_: IOException) {
+        pinger().exceptionHandler {
             if (starting) {
                 player.sendMessage(Component.text("The server is already starting..."))
-                return@addListener
+                return@exceptionHandler
             }
             starting = true
             val state = scaleway.serverState()
             if (state == ScalewayAPI.ServerState.RUNNING || state == ScalewayAPI.ServerState.STARTING) {
                 LOGGER.warning("Server already running/starting")
-                return@addListener
+                return@exceptionHandler
             } else if (state == ScalewayAPI.ServerState.LOCKED) {
                 LOGGER.warning("Server locked")
-                return@addListener
+                return@exceptionHandler
             }
             LOGGER.info("Starting the server")
             player.sendMessage(Component.text("Starting the server for you..."))
@@ -116,24 +106,24 @@ fun main(args: Array<String>) {
                 val state = scaleway.serverState()
                 if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
                 LOGGER.info("Server started, waiting for the Minecraft server")
-                player.sendMessage(Component.text("Waiting for the Minecraft server..."))
+//                player.sendMessage(Component.text("Waiting for the Minecraft server..."))
                 TIMER.schedule(5*60*1000L, 5*60*1000L) {
-                    try {
-                        pinger.fetchData()
-
+                    pinger().exceptionHandler {}.responseHandler {
                         instance.players.forEach {
                             LOGGER.info {
                                 val name = PlainTextComponentSerializer.plainText().serialize(it.name)
                                 "Sending $name (${it.uuid}) to the server"
                             }
-                            it.sendPacket(TransferPacket(options.hostname, options.port))
+                            it.sendPacket(TransferPacket(hostname, port))
                         }
                         cancel()
-                    } catch (_: IOException) {}
+                    }.sync
                 }
                 cancel()
             }
-        }
+        }.responseHandler {
+            player.sendPacket(TransferPacket(hostname, port))
+        }.sync
     }
 
     handler.addListener(PlayerDisconnectEvent::class.java) { event ->
@@ -151,16 +141,13 @@ fun main(args: Array<String>) {
     handler.addListener(ServerListPingEvent::class.java) {
         val respData = it.responseData
         respData.clearEntries()
-        try {
-            val data = pinger.fetchData()
-            respData.description = Component.text("The server is running.")
-            data.players.sample.forEach { p ->
-                respData.addEntry(NamedAndIdentified.named(p.name))
-            }
-        } catch (_: IOException) {
+        pinger().exceptionHandler {
             respData.setPlayersHidden(true)
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
-        }
+        }.responseHandler { data ->
+            respData.description = Component.text("The server is running.")
+            data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.named(p.name)) }
+        }.sync
     }
 
     handler.addListener(PlayerCommandEvent::class.java) {
@@ -170,7 +157,7 @@ fun main(args: Array<String>) {
 
     val commands = MinecraftServer.getCommandManager()
     commands.register(InfoCommand(scaleway))
-    commands.register(ConnectCommand(pinger, options))
+    commands.register(ConnectCommand(pinger, hostname, port))
 
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
     LOGGER.info("Minecraft Scaleway Frontend started")

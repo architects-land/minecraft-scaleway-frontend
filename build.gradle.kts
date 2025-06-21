@@ -5,12 +5,10 @@ plugins {
 }
 
 group = "world.anhgelus.world.architectsland.minecraftscalewayfrontend"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
-
-    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -20,7 +18,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
     implementation("net.minestom:minestom-snapshots:e94aaed297")
-    implementation("com.github.replydev:mcping:1.0.2")
+    implementation("net.lenni0451:MCPing:1.4.4")
 }
 
 java {

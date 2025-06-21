@@ -1,11 +1,10 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
+import net.lenni0451.mcping.MCPing
+import net.lenni0451.mcping.responses.MCPingResponse
 import net.minestom.server.command.builder.Command
 import net.minestom.server.entity.Player
 import net.minestom.server.network.packet.server.common.TransferPacket
-import org.replydev.mcping.MCPinger
-import org.replydev.mcping.PingOptions
-import java.io.IOException
 
 class InfoCommand(val scaleway: ScalewayAPI) : Command("info") {
     init {
@@ -15,22 +14,19 @@ class InfoCommand(val scaleway: ScalewayAPI) : Command("info") {
     }
 }
 
-class ConnectCommand(val pinger: MCPinger, val options: PingOptions) : Command("connect") {
+class ConnectCommand(val pinger: () -> MCPing<MCPingResponse>, val hostname: String, val port: Int) : Command("connect") {
     init {
         setDefaultExecutor { sender, _ ->
-            try {
-                pinger.fetchData()
-
+            pinger().exceptionHandler {
+                it.printStackTrace()
+                sender.sendMessage("Cannot connect to the server (not started yet)")
+            }.responseHandler {
                 if (sender !is Player) {
                     sender.sendMessage("You are not a player :(")
-                    return@setDefaultExecutor
+                    return@responseHandler
                 }
-
-                sender.sendPacket(TransferPacket(options.hostname, options.port))
-            } catch (e: IOException) {
-                e.printStackTrace()
-                sender.sendMessage("Cannot connect to the server (not started yet)")
-            }
+                sender.sendPacket(TransferPacket(hostname, port))
+            }.sync
         }
     }
 }
