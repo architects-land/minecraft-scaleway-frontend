@@ -160,22 +160,28 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
         }
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
-        TIMER.schedule(5*1000L, 5*1000L) {
-            pinger().exceptionHandler {
-                LOGGER.info("Minecraft server is still starting... Current information: ${it.message}")
-            }.responseHandler {
-                instance.players.forEach {
-                    LOGGER.info {
-                        val name = PlainTextComponentSerializer.plainText().serialize(it.name)
-                        "Sending $name (${it.uuid}) to the server"
-                    }
-                    it.sendPacket(TransferPacket(hostname, port))
-                }
-                cancel()
-            }.sync
-        }
+
+        setupServerTransfer(pinger, instance, hostname, port)
         setupServerPowerOff(scaleway)
+
         cancel()
+    }
+}
+
+fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
+    TIMER.schedule(5*1000L, 5*1000L) {
+        pinger().exceptionHandler {
+            LOGGER.info("Minecraft server is still starting... Current information: ${it.message}")
+        }.responseHandler {
+            instance.players.forEach {
+                LOGGER.info {
+                    val name = PlainTextComponentSerializer.plainText().serialize(it.name)
+                    "Sending $name (${it.uuid}) to the server"
+                }
+                it.sendPacket(TransferPacket(hostname, port))
+            }
+            cancel()
+        }.sync
     }
 }
 
