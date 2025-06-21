@@ -97,6 +97,10 @@ fun main(args: Array<String>) {
             }
             startServer(scaleway, pinger, instance, hostname, port)
         }.responseHandler {
+            LOGGER.info {
+                val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
+                "Player $name (${event.player.uuid}) transferred to the Minecraft server"
+            }
             player.sendPacket(TransferPacket(hostname, port))
         }.sync
     }
@@ -121,6 +125,7 @@ fun main(args: Array<String>) {
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
         }.responseHandler { data ->
             respData.description = Component.text("The server is running.")
+            respData.maxPlayer = respData.maxPlayer
             data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.named(p.name)) }
         }.sync
     }
