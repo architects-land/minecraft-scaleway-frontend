@@ -1,6 +1,8 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import net.kyori.adventure.chat.ChatType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.minestom.server.MinecraftServer
@@ -53,6 +55,7 @@ fun main(args: Array<String>) {
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
 
+    MinecraftServer.setBrandName("Architects Land - Lobby")
     val server = MinecraftServer.init()
 
     // make server use online mode

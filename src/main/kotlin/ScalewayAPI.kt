@@ -38,6 +38,14 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
         )
     }
 
+    fun powerOffServer() {
+        send(
+            builder("https://api.scaleway.com/instance/v1/zones/$zone/servers/$server/action")
+                .POST(HttpRequest.BodyPublishers.ofString("{\"action\":\"poweroff\"}"))
+                .build()
+        )
+    }
+
     fun serverState(): ServerState {
         val resp = send(builder("https://api.scaleway.com/instance/v1/zones/$zone/servers/$server").GET().build())
         val decoder = Json { ignoreUnknownKeys = true }
