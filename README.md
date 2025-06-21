@@ -16,6 +16,8 @@ java -jar server.jar \
 You can also pass `--port uint` (default: 25565) to set the port of the server or `--minecraft-port` to set the port
 of the Minecraft server (default: 25565).
 
+You can modify the server name with `--server-name string` (escape space or use quotes if your string contains space).
+
 ## Technology
 
 - Minestom

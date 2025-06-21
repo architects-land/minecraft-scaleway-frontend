@@ -54,7 +54,7 @@ fun main(args: Array<String>) {
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
 
     val server = MinecraftServer.init()
-    MinecraftServer.setBrandName("Architects Land - Lobby")
+    MinecraftServer.setBrandName(parser.getOrDefault("server-name", "Minecraft Scaleway Frontend"))
 
     // make server use online mode
     MojangAuth.init()
