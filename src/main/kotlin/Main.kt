@@ -78,8 +78,10 @@ fun main(args: Array<String>) {
     // spawn player
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
-        val playerName = PlainTextComponentSerializer.plainText().serialize(player.name)
-        LOGGER.info("Player $playerName (${player.uuid}) connected")
+        LOGGER.info {
+            val name = PlainTextComponentSerializer.plainText().serialize(player.name)
+            "Player $name (${player.uuid}) connected"
+        }
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
         player.gameMode = GameMode.SPECTATOR
@@ -87,9 +89,16 @@ fun main(args: Array<String>) {
         try {
             pinger.fetchData()
 
+            LOGGER.info {
+                val name = PlainTextComponentSerializer.plainText().serialize(player.name)
+                "Sending $name (${player.uuid}) to the server"
+            }
             player.sendPacket(TransferPacket(options.hostname, options.port))
         } catch (_: IOException) {
-            if (starting) return@addListener
+            if (starting) {
+                player.sendMessage(Component.text("The server is already starting..."))
+                return@addListener
+            }
             starting = true
             val state = scaleway.serverState()
             if (state == ScalewayAPI.ServerState.RUNNING || state == ScalewayAPI.ServerState.STARTING) {
@@ -99,15 +108,23 @@ fun main(args: Array<String>) {
                 LOGGER.warning("Server locked")
                 return@addListener
             }
+            LOGGER.info("Starting the server")
+            player.sendMessage(Component.text("Starting the server for you..."))
             scaleway.startServer()
             TIMER.schedule(10*60*1000L, 10*60*1000L) {
                 val state = scaleway.serverState()
                 if (state != ScalewayAPI.ServerState.RUNNING) return@schedule
+                LOGGER.info("Server started, waiting for the Minecraft server")
+                player.sendMessage(Component.text("Waiting for the Minecraft server..."))
                 TIMER.schedule(5*60*1000L, 5*60*1000L) {
                     try {
                         pinger.fetchData()
 
                         instance.players.forEach {
+                            LOGGER.info {
+                                val name = PlainTextComponentSerializer.plainText().serialize(it.name)
+                                "Sending $name (${it.uuid}) to the server"
+                            }
                             it.sendPacket(TransferPacket(options.hostname, options.port))
                         }
                         cancel()
