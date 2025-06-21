@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
         LOGGER.severe("Specify the api key to use")
         return
     }
-    if (!parser.has("minecraft-ip")) {
+    if (!parser.has("minecraft-host")) {
         LOGGER.severe("Specify the ip address of the minecraft server")
         return
     }
@@ -67,7 +67,7 @@ fun main(args: Array<String>) {
 
     val handler = MinecraftServer.getGlobalEventHandler()
 
-    val hostname = parser.get("minecraft-ip")!!
+    val hostname = parser.get("minecraft-host")!!
     val port = parser.getIntOrDefault("minecraft-port", 25565)
 
     val pinger = { MCPing.pingModern().address(hostname, port) }
