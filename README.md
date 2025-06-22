@@ -8,7 +8,11 @@ If the server is `stopped in place` (powered off, but still in Scaleway's hyperv
 
 ## Usage
 
-Logs are in `logs/minecraftscalewayfrontend.log`.
+Logs are in `logs/`.
+
+The current logs are in `latest.log`.
+This file is compressed with GZip when the program is stopped.
+Its new name is `yyyy-MM-dd HH:mm.log.gz` (program launch date).
 
 ### CLI
 ```bash
@@ -26,7 +30,7 @@ You can modify the server name with `--server-name string` (escape space or use 
 
 You specify a whitelist with `--whitelist`.
 Separate each user with a coma (`,`).
-You can use their Minecraft's username or their UUID.
+You can use their Minecraft's username or their UUID, e.g.: `anhgelus,ascpial`, `anhgelus,3f6ddb7c-f214-48a9-9f4a-eb22b9cf53f0`
 
 ### Docker
 

@@ -34,6 +34,7 @@ private var powerOffTask: TimerTask? = null
 
 fun main(args: Array<String>) {
     LOGGER.info("Minecraft Scaleway Frontend launched")
+    val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
     val parser = ArgsParser(args)
 
     if (!parser.has("zone")) {
@@ -162,7 +163,6 @@ fun main(args: Array<String>) {
                 MinecraftServer.stopCleanly()
                 TIMER.cancel()
                 LOGGER.info("Stopped")
-                val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                 GZip.compress("logs/latest.log", "logs/$today.log.gz")
                 Files.delete(Path.of("logs/latest.log"))
             }
