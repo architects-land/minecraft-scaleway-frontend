@@ -125,7 +125,7 @@ fun main(args: Array<String>) {
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
         }.responseHandler { data ->
             respData.description = Component.text("The server is running.")
-            respData.maxPlayer = respData.maxPlayer
+            respData.maxPlayer = data.maxPlayers
             data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.named(p.name)) }
         }.sync
     }
