@@ -22,7 +22,7 @@ ENV SERVER_NAME="Minecraft Scaleway Frontend"
 ENV WHITELIST=""
 
 CMD [
-    "java", "-jar", "*.jar",
+    "/usr/bin/java", "-jar", "*.jar",
     "--port", "$PORT",
      "--zone", "$ZONE",
      "--server", "$SERVER",
