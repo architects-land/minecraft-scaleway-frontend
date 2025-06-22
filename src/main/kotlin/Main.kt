@@ -49,6 +49,12 @@ fun main(args: Array<String>) {
         return
     }
 
+    var whitelist: List<String>? = null
+    val whitelistEnabled = parser.has("whitelist")
+    if (whitelistEnabled) {
+        whitelist = parser.get("whitelist")!!.split(",")
+    }
+
     TIMER =  Timer()
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
@@ -72,10 +78,13 @@ fun main(args: Array<String>) {
 
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
-        LOGGER.info {
-            val name = PlainTextComponentSerializer.plainText().serialize(player.name)
-            ParameterizedMessage("Player {} ({}) connected", name, player.uuid)
+        val name = PlainTextComponentSerializer.plainText().serialize(player.name)
+        if (whitelistEnabled && !whitelist!!.any { name == it || player.uuid.toString() == it }) {
+            LOGGER.info("Player {} ({}) not whitelisted", name, player.uuid)
+            player.kick("You are not whitelisted.")
+            return@addListener
         }
+        LOGGER.info("Player {} ({}) connected", name, player.uuid)
         event.spawningInstance = instance
         player.respawnPoint = Pos(0.0, 42.0, 0.0)
         player.gameMode = GameMode.SPECTATOR
