@@ -51,6 +51,8 @@ Environments:
 - `SERVER_NAME` is the name of this server (shown in the debug screen)
 - `WHITELIST` is the whitelist (same syntax of the CLI's arg)
 
+To save the logs, bind a volume to `/app/logs`.
+
 ## Technology
 
 - Minestom
