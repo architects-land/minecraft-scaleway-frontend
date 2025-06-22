@@ -19,6 +19,10 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -158,6 +162,9 @@ fun main(args: Array<String>) {
                 MinecraftServer.stopCleanly()
                 TIMER.cancel()
                 LOGGER.info("Stopped")
+                val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                GZip.compress("logs/latest.log", "logs/$today.log.gz")
+                Files.delete(Path.of("logs/latest.log"))
             }
         }
     }
