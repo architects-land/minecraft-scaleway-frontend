@@ -4,11 +4,11 @@ Fake Minecraft Server used as a frontend to hourly paid Scaleway servers.
 
 Automatically start the server if a player is waiting.
 If the server is started, transfer the player to the server.
-If the server is `stopped in place` (powered off, but still in Scaleway's hypervisor), power off it.
+If the server is `stopped in place` (powered off, but still in Scaleway's hypervisor), remove it from Scaleway's hypervisor.
 
 ## Usage
 
-Logs are in `logs/minecraftscalewayfrontend.log`
+Logs are in `logs/minecraftscalewayfrontend.log`.
 
 ### CLI
 ```bash
@@ -35,7 +35,7 @@ You can use the official Docker image `ghcr.io/architects-land/minecraft-scalewa
 Tags:
 - `latest` is always the latest one
 - `main` is for the main branch
-- `v*` is for a specific tag
+- `v*` is for a specific tag (e.g., `v1.0.0`)
 
 Environments:
 - `PORT` is the server's port
