@@ -43,3 +43,7 @@ bin/
 
 .env
 *.log
+logs
+
+# debug logs
+src/main/resources/log4j2-test.xml

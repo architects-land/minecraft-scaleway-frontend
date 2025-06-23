@@ -193,7 +193,8 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
 fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
     TIMER.schedule(15*1000L, 5*1000L) {
         pinger().exceptionHandler {
-            LOGGER.info("Assuming that the Minecraft server is still starting...", it)
+            LOGGER.info("Assuming that the Minecraft server is still starting...")
+            LOGGER.trace("Pinger exception", it)
         }.responseHandler {
             instance.players.forEach {
                 LOGGER.info {
