@@ -8,6 +8,23 @@ If the server is `stopped in place` (powered off, but still in Scaleway's hyperv
 
 ## Usage
 
+Vocabulary:
+- "server" for this software
+- "instance" for the server hosted by Scaleway (that is the product's official name)
+- "Minecraft server" for the Minecraft server hosted on the instance 
+
+The program requires 4 arguments to run:
+- [your API key](https://www.scaleway.com/en/docs/iam/how-to/create-api-keys/), it's a UUID
+- instance's ID (available on the instance's dashboard), it's a UUID
+- [instance's zone](https://www.scaleway.com/en/docs/instances/concepts/#availability-zone) (they call it "Availability Zones")
+- Minecraft's host that is used during the player's transfer; in most cases, this is the instance's IP
+
+You can pass these optionals arguments:
+- port of the server (default: `25565`)
+- port of the Minecraft server (default: `25565`)
+- name of the server visible in the debug screen (default: `Minecraft Scaleway Frontend`)
+- whitelist (default: no whitelist), separate each user with a coma (`,`); you can use their Minecraft's username and their UUID
+
 Logs are in `logs/`.
 
 The current logs are in `latest.log`.
@@ -18,19 +35,18 @@ Its new name is `yyyy-MM-dd HH:mm.log.gz` (program launch date).
 ```bash
 java -jar server.jar \
   --zone scaleway-zone \
-  --server server-uuid \
+  --server instance-id \
   --api-key your-api-key \
   --minecraft-host ip-of-minecraft-server
 ```
 
-You can also pass `--port uint` (default: 25565) to set the port of the server or `--minecraft-port` to set the port
-of the Minecraft server (default: 25565).
+You can also use `--port` to set the port of the server or `--minecraft-port` to set the port
+of the Minecraft server.
 
-You can modify the server name with `--server-name string` (escape space or use quotes if your string contains space).
+You can modify the server name with `--server-name string` (use quotes if your string contains space).
 
-You specify a whitelist with `--whitelist`.
-Separate each user with a coma (`,`).
-You can use their Minecraft's username or their UUID, e.g.: `anhgelus,ascpial`, `anhgelus,3f6ddb7c-f214-48a9-9f4a-eb22b9cf53f0`
+You specify a whitelist with `--whitelist`, e.g.: `--whitelist anhgelus,ascpial`, 
+`--whitelist anhgelus,3f6ddb7c-f214-48a9-9f4a-eb22b9cf53f0`.
 
 ### Docker
 
@@ -43,15 +59,35 @@ Tags:
 
 Environments:
 - `PORT` is the server's port
-- `ZONE` is the Scaleway's zone
-- `SERVER` is the UUID of the Scaleway's server
-- `API_KEY` is your Scaleway's API key
-- `MINECRAFT_HOST` is the host of your Minecraft server (will be used during the transfer)
+- `ZONE` is the instance's zone
+- `SERVER` is the ID of the instance
+- `API_KEY` is your API key
+- `MINECRAFT_HOST` is the host of your Minecraft server
 - `MINECRAFT_PORT` is the port of your Minecraft server
-- `SERVER_NAME` is the name of this server (shown in the debug screen)
-- `WHITELIST` is the whitelist (same syntax of the CLI's arg)
+- `SERVER_NAME` is the name of this server
+- `WHITELIST` is the whitelist
 
 To save the logs, bind a volume to `/app/logs`.
+
+Example `docker-compose.yml`:
+```yml
+services:
+  frontend:
+    image: ghcr.io/architects-land/minecraft-scaleway-frontend:v1.0.0
+    ports:
+      - 25565:25565
+    environment:
+      PORT: 25565
+      ZONE: fr-par-2
+      SERVER: 00000000-0000-0000-0000-000000000000
+      API_KEY: 00000000-0000-0000-0000-000000000000
+      MINECRAFT_HOST: 198.51.100.0 # example IP
+      MINECRAFT_PORT: 25565
+      SERVER_NAME: "My frontend"
+      WHITELIST: anhgelus
+    volumes:
+      - ./logs:/app/logs
+```
 
 ## Technology
 
