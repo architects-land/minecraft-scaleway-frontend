@@ -2,6 +2,14 @@
 
 The server is a proxy and the Minecraft server hosted on the instance is behind it.
 
+## Commands
+
+The server adds 2 commands: `/info` and `/connect`.
+
+`/info` sends you the current state of the instance and of the Minecraft server if the instance is running.
+
+`/connect` forces the connection to the Minecraft server. Useful if you think that the server bug.
+
 ## First connection
 
 When a player connect to the server for the first time, the server starts the instance.
