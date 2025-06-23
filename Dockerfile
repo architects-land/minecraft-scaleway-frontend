@@ -8,6 +8,10 @@ RUN gradle build
 
 FROM eclipse-temurin:21-alpine
 
+LABEL org.opencontainers.image.source="https://github.com/architects-land/minecraft-scaleway-frontend"
+LABEL org.opencontainers.image.description="Fake Minecraft Server used as a frontend to hourly paid Scaleway servers."
+LABEL org.opencontainers.image.licenses="AGPL-3.0-only"
+
 WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar .
