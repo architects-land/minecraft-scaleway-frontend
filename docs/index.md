@@ -16,10 +16,10 @@ hero:
 
 features:
   - title: Whitelist
-    details: Manage who can connect to your server
+    details: Manage who can connect to your server.
   - title: Smart start
     details: Start the server only if needed!
   - title: Automatic shutdown
-    details: Shutdown the server to prevent unwanted cost
+    details: Shutdown the server to prevent unwanted cost.
 ---
 

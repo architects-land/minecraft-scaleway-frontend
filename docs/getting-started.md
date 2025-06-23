@@ -1,2 +1,219 @@
 # Getting started
 
+Minecraft Scaleway Frontend requires:
+- something to host the server (could be a VPS, a serverless instance or just a Docker container running in a cluster);
+- an instance from Scaleway using a Linux distribution (in this tutorial, we will use Rocky Linux).
+
+::: tip Vocabulary
+"Server" is the software "Minecraft Scaleway Frontend".
+
+"Instance" is the instance from Scaleway.
+
+"Minecraft server" is the Minecraft server hosted by the instance.
+:::
+
+## Instance's configuration
+
+### Scaleway configuration
+
+Choose the appropriate instance on the Scaleway's website.
+
+Don't forget to use a public IPv4 in addition to this (Yggdrasil, the server used for Minecraft's authentification, does
+not support IPv6).
+
+Don't forget to add a storage.
+It will contain the OS plus the Minecraft server.
+
+Then, you can choose your Linux distribution.
+Prefer a RHEL-based distribution: it is way more stable.
+
+### Running the Minecraft server
+
+Now, we will install Java to run Minecraft. 
+For Rocky Linux, you can use
+```bash
+curl https://raw.githubusercontent.com/anhgelus/cloud-setups/refs/heads/main/minecraft/only-java/java21-rocky.sh | bash
+```
+to install Adoptium Temurin JRE 21.
+You can use any OpenJDK distribution supporting Java 21.
+
+We will create the folder containing and the user running the Minecraft server.
+Run to create a new user `minecraft`
+```bash
+useradd minecraft
+usermod -s /usr/sbin/nologin minecraft
+```
+You will not be able to connect to this user.
+Run to create the folder container the Minecraft server
+```bash
+mkdir /var/minecraft
+```
+Install your Minecraft server in `/var/minecraft`.
+Start it, stop it and modify `server.properties` to allow server transfer (protocol used by the server to send players 
+to the Minecraft server).
+Modify the owner of `/var/minecraft` and set it to `minecraft:minecraft`
+```bash
+chown -R minecraft:minecraft /var/minecraft
+```
+Now, if you want to manage the Minecraft server via your shell, add `sudo -u minecraft` before every command.
+
+We will create the systemd unit file for the server.
+Put this content in `/etc/systemd/system/minecraft.service`
+```service
+[Unit]
+Description=Minecraft server service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=minecraft
+WorkingDirectory=/var/minecraft
+
+# customize the CLI
+ExecStart=/usr/bin/java # command to start the server
+
+Restart=always
+#RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+```
+Then, reload systemd and enable the service
+```bash
+systemctl daemon-reload
+systemctl enable minecraft.service
+```
+It will start the Minecraft server everytime the instance restarts.
+
+:::tip Can't execute binary or service?
+If you can't execute the binary or the service and if your OS use SELinux (like any RHEL-based distro), use
+```bash
+restorecon [path]
+```
+where `[path]` is the path of the binary or of the service.
+:::
+
+### Stopping the instance and the Minecraft server if no one is connected
+
+Currently, the instance and the Minecraft server will never be stopped if no one is connected.
+To fix this issue, you can use [Server Stopper](https://github.com/architects-land/server-stopper).
+This is a mod and a service made for this.
+
+Architects Land does not provide compiled version of these, so you must compile it yourself.
+It requires Java 21, Gradle and Go 1.24+.
+
+You can upload these to the instance.
+Put the jar in the mod folder (`/var/minecraft/mods`).
+Do not forget to give the permission to the `minecraft` user.
+Put the service jar in `/usr/local/bin`.
+
+Download the service file provided in GitHub and put it in `/etc/systemd/system/`
+```bash
+curl -o /etc/systemd/system/server-stopper.service https://raw.githubusercontent.com/architects-land/server-stopper/refs/heads/main/service/server-stopper.service
+```
+Edit this if required.
+
+Now, enables the service and start it
+```bash
+systemctl enable --now server-stopper.service
+```
+
+:::tip Can't execute binary or service?
+If you can't execute the binary or the service and if your OS use SELinux (like any RHEL-based distro), use
+```bash
+restorecon [path]
+```
+where `[path]` is the path of the binary or of the service.
+:::
+
+You can start the Minecraft server with
+```bash
+systemctl start minecraft.service
+```
+If the Minecraft server is empty during 5 minutes, the Minecraft server will be stopped and the instance will be powered 
+off.
+
+## Server configuration
+
+You can use the binary or use Docker to deploy the server.
+You can deploy this where do you want (it uses less than 100MB RAM when one player is connected waiting for the 
+Minecraft server to be on).
+
+The server has 4 required arguments:
+- [your API key](https://www.scaleway.com/en/docs/iam/how-to/create-api-keys/), it's a UUID
+- instance's ID (available on the instance's dashboard), it's a UUID
+- [instance's zone](https://www.scaleway.com/en/docs/instances/concepts/#availability-zone) (they call it "Availability Zones")
+- Minecraft's host that is used during the player's transfer; in most cases, this is the instance's IP
+
+You can pass these optionals arguments:
+- port of the server (default: `25565`)
+- port of the Minecraft server (default: `25565`)
+- name of the server visible in the debug screen (default: `Minecraft Scaleway Frontend`)
+- whitelist (default: no whitelist), separate each user with a coma (`,`); you can use their Minecraft's username and their UUID
+
+### CLI
+
+```bash
+java -jar server.jar \
+  --zone instance-zone \
+  --instance instance-id \
+  --api-key your-api-key \
+  --minecraft-host ip-of-minecraft-server
+```
+
+You can also use `--port` to set the port of the server or `--minecraft-port` to set the port
+of the Minecraft server.
+
+You can modify the server name with `--server-name string` (use quotes if your string contains space).
+
+You specify a whitelist with `--whitelist`, e.g.: `--whitelist anhgelus,ascpial`,
+`--whitelist anhgelus,3f6ddb7c-f214-48a9-9f4a-eb22b9cf53f0`.
+
+### Docker
+
+You can use the official Docker image `ghcr.io/architects-land/minecraft-scaleway-frontend`.
+
+Tags:
+- `latest` is always the latest one
+- `main` is for the main branch
+- `v*` is for a specific tag (e.g., `v1.0.0`)
+
+Environments:
+- `PORT` is the server's port
+- `ZONE` is the instance's zone
+- `INSTANCE` is the ID of the instance
+- `API_KEY` is your API key
+- `MINECRAFT_HOST` is the host of your Minecraft server
+- `MINECRAFT_PORT` is the port of your Minecraft server
+- `SERVER_NAME` is the name of this server
+- `WHITELIST` is the whitelist
+
+To save the logs, bind a volume to `/app/logs`.
+
+Example `docker-compose.yml`:
+```yml
+services:
+  frontend:
+    image: ghcr.io/architects-land/minecraft-scaleway-frontend:v1.0.0
+    ports:
+      - 25565:25565
+    environment:
+      PORT: 25565
+      ZONE: fr-par-2
+      SERVER: 00000000-0000-0000-0000-000000000000
+      API_KEY: 00000000-0000-0000-0000-000000000000
+      MINECRAFT_HOST: 198.51.100.0 # example IP
+      MINECRAFT_PORT: 25565
+      SERVER_NAME: "My frontend"
+      WHITELIST: anhgelus
+    volumes:
+      - ./logs:/app/logs
+```
+
+### Logs
+
+Logs are in `logs/`.
+
+The current logs are in `latest.log`.
+This file is compressed with GZip when the program is stopped.
+Its new name is `yyyy-MM-dd HH:mm.log.gz` (program launch date).

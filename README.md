@@ -34,7 +34,7 @@ Its new name is `yyyy-MM-dd HH:mm.log.gz` (program launch date).
 ### CLI
 ```bash
 java -jar server.jar \
-  --zone scaleway-zone \
+  --zone instance-zone \
   --instance instance-id \
   --api-key your-api-key \
   --minecraft-host ip-of-minecraft-server
