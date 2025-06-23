@@ -139,7 +139,7 @@ fun main(args: Array<String>) {
             respData.setPlayersHidden(true)
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
         }.responseHandler { data ->
-            respData.description = Component.text("The server is running.")
+            respData.description = Component.text(data.description)
             respData.maxPlayer = data.maxPlayers
             data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.named(p.name)) }
         }.sync
