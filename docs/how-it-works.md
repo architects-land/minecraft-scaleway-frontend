@@ -1,4 +1,4 @@
-# How it works
+# How it works ?
 
 The server is a proxy and the Minecraft server hosted on the instance is behind it.
 
@@ -22,7 +22,7 @@ If the instance is running, it checks if the Minecraft server is started.
 If it is, the server sends the player to the Minecraft server.
 If it isn't, it waits until the Minecraft server is ready.
 
-If the instance is not running (including if it is `stopped in place`), the server consider that is the first connection.
+If the instance is not running (including if it is `stopped in place`), the server will consider it as the first connection.
 
 ## When a player disconnect
 
@@ -30,5 +30,5 @@ The mod [Server Stopper](https://github.com/architects-land/server-stopper) send
 service [Server Stopper](https://github.com/architects-land/server-stopper) using a UNIX socket.
 
 If the Minecraft server is empty, the service waits 5 minutes.
-If the Minecraft server remains empty, the service power off the instance.
+If the Minecraft server remains empty, the service powers off the instance.
 The instance is `stopped in place` and can be fully stopped by the server.

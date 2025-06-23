@@ -8,6 +8,8 @@ If the server is `stopped in place` (powered off, but still in Scaleway's hyperv
 
 ## Usage
 
+A complete documentation is hosted [here](https://architects-land.github.io/minecraft-scaleway-frontend/)
+
 Vocabulary:
 - "server" for this software
 - "instance" for the server hosted by Scaleway (that is the product's official name)
