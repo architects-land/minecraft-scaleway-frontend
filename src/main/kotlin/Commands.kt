@@ -6,10 +6,20 @@ import net.minestom.server.command.builder.Command
 import net.minestom.server.entity.Player
 import net.minestom.server.network.packet.server.common.TransferPacket
 
-class InfoCommand(val scaleway: ScalewayAPI) : Command("info") {
+class InfoCommand(val scaleway: ScalewayAPI, val pinger: () -> MCPing<MCPingResponse>) : Command("info") {
     init {
         setDefaultExecutor { sender, _ ->
-            sender.sendMessage("Server's state: ${scaleway.serverState()}")
+            val state = scaleway.serverState()
+            val base = "Instance's state: $state"
+            if (state != ScalewayAPI.ServerState.RUNNING) {
+                sender.sendMessage(base)
+                return@setDefaultExecutor
+            }
+            pinger().exceptionHandler {
+                sender.sendMessage("$base\nMinecraft server not started yet.")
+            }.responseHandler {
+                sender.sendMessage("$base\nMinecraft server is online. Use /connect to connect you.\nThis is a bug, please report it.")
+            }.sync
         }
     }
 }

@@ -151,7 +151,7 @@ fun main(args: Array<String>) {
     }
 
     val commands = MinecraftServer.getCommandManager()
-    commands.register(InfoCommand(scaleway))
+    commands.register(InfoCommand(scaleway, pinger))
     commands.register(ConnectCommand(pinger, hostname, port))
 
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
