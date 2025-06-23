@@ -41,8 +41,8 @@ fun main(args: Array<String>) {
         LOGGER.error("Specify the zone of the server")
         return
     }
-    if (!parser.has("server")) {
-        LOGGER.error("Specify the server")
+    if (!parser.has("instance")) {
+        LOGGER.error("Specify the instance")
         return
     }
     if (!parser.has("api-key")) {
@@ -63,7 +63,7 @@ fun main(args: Array<String>) {
 
     TIMER =  Timer()
 
-    val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("server")!!)
+    val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("instance")!!)
 
     val server = MinecraftServer.init()
     MinecraftServer.setBrandName(parser.getOrDefault("server-name", "Minecraft Scaleway Frontend"))

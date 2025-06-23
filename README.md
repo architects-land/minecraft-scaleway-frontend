@@ -35,7 +35,7 @@ Its new name is `yyyy-MM-dd HH:mm.log.gz` (program launch date).
 ```bash
 java -jar server.jar \
   --zone scaleway-zone \
-  --server instance-id \
+  --instance instance-id \
   --api-key your-api-key \
   --minecraft-host ip-of-minecraft-server
 ```
@@ -60,7 +60,7 @@ Tags:
 Environments:
 - `PORT` is the server's port
 - `ZONE` is the instance's zone
-- `SERVER` is the ID of the instance
+- `INSTANCE` is the ID of the instance
 - `API_KEY` is your API key
 - `MINECRAFT_HOST` is the host of your Minecraft server
 - `MINECRAFT_PORT` is the port of your Minecraft server
