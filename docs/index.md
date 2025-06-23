@@ -4,22 +4,22 @@ layout: home
 
 hero:
   name: "Minecraft Scaleway Frontend"
-  text: "Fake Minecraft Server used as a frontend to hourly paid Scaleway servers."
-  tagline: My great project tagline
+  text: "Cost optimizer"
+  tagline: "Fake Minecraft Server used as a frontend to hourly paid Scaleway servers."
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Getting started
+      link: /getting-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: How it works?
+      link: /how-it-works
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Whitelist
+    details: Manage who can connect to your server
+  - title: Smart start
+    details: Start the server only if needed!
+  - title: Automatic shutdown
+    details: Shutdown the server to prevent unwanted cost
 ---
 

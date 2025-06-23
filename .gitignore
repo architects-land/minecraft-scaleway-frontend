@@ -41,10 +41,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-.env
-*.log
-logs
-
 # Created by https://www.toptal.com/developers/gitignore/api/node,bun
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,bun
 ### Node ###
@@ -185,5 +181,10 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node,bun
+
+.env
+*.log
+logs
+
 docs/.vitepress/dist
 docs/.vitepress/cache
