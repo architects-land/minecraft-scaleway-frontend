@@ -15,10 +15,11 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Introduction',
+        text: 'Simple Usage',
         items: [
           { text: 'Getting started', link: '/getting-started' },
-          { text: 'How it works', link: '/how-it-works' }
+          { text: 'How it works', link: '/how-it-works' },
+          { text: 'Server Stopper', link: '/server-stopper' }
         ]
       }
     ],
