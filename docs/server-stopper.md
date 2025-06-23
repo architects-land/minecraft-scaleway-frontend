@@ -37,3 +37,18 @@ systemctl start minecraft.service
 ```
 If the Minecraft server is empty during 5 minutes, the Minecraft server will be stopped and the instance will be powered
 off.
+
+## Configuration
+
+You can customize how the service works with arguments.
+
+The service automatically stop the instance after 5 minutes of activity.
+You can modify this delay with the argument `--minute-before-poweroff int`.
+The integer must be positive non-null.
+
+In the default service unit file, there is the argument `-systemd` indicating that the instance is using systemd as an 
+init.
+If your instance does not use it, remove this.
+
+You can modify the UNIX socket path with the argument `--socket string`.
+If you do it, you must modify it in the mod's config (`mods/server-stopper.properties`).
