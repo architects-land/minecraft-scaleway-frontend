@@ -52,3 +52,8 @@ If your instance does not use it, remove this.
 
 You can modify the UNIX socket path with the argument `--socket string`.
 If you do it, you must modify it in the mod's config (`mods/server-stopper.properties`).
+
+If you want to only stop the Minecraft server and not the instance, you can use the argument `-stop-only-minecraft` to
+only stop Minecraft. (This argument must be used on a systemd Linux distribution.)
+The argument `-minecraft-service string` specifies the name of the service to stop.
+By default, this is `minecraft.service`.
