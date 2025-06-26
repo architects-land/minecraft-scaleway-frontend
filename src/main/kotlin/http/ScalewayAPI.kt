@@ -1,15 +1,14 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend
+package world.anhgelus.world.architectsland.minecraftscalewayfrontend.http
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
-    class HttpErrorException(override val message: String?) : RuntimeException(message)
-
+class ScalewayAPI(val apiKey: String, val zone: String, val server: String) : HttpAPI() {
     @Serializable
     data class Server(val id: String, val name: String, val state: String)
 
@@ -19,8 +18,6 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
     enum class ServerState {
         RUNNING, STOPPED, STOPPED_IN_PLACE, STARTING, STOPPING, LOCKED
     }
-
-    private val client = HttpClient.newHttpClient()
 
     init {
         try {
@@ -61,19 +58,9 @@ class ScalewayAPI(val apiKey: String, val zone: String, val server: String) {
         }
     }
 
-    private fun builder(uri: String): HttpRequest.Builder {
-        return HttpRequest.newBuilder()
-            .uri(URI.create(uri))
+    override fun builder(uri: String): HttpRequest.Builder {
+        return super.builder(uri)
             .setHeader("X-Auth-Token", apiKey)
             .setHeader("Content-Type", "application/json")
-    }
-
-    private fun send(request: HttpRequest): HttpResponse<String> {
-        val resp = client.send(request, HttpResponse.BodyHandlers.ofString())
-        if (resp.statusCode() >= 400) {
-            LOGGER.info(resp.body())
-            throw HttpErrorException("Invalid server response status code: ${resp.statusCode()}")
-        }
-        return resp
     }
 }

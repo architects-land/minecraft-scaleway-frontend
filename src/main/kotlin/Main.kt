@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
