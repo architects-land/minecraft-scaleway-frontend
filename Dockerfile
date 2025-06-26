@@ -30,6 +30,7 @@ CMD exec java -jar *.jar \
     --port "$PORT" \
     --zone "$ZONE" \
     --instance "$INSTANCE" \
+    --api-key "$API_KEY" \
     --minecraft-host "$MINECRAFT_PORT" \
     --minecraft-port "$MINECRAFT_PORT" \
     --server-name "$SERVER_NAME" \
