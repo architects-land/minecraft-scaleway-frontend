@@ -22,4 +22,8 @@ class DiscordWebhookAPI(val url: String?, val username: String? = null) : HttpAP
                 .build()
         )
     }
+
+    override fun builder(uri: String): HttpRequest.Builder {
+        return super.builder(uri).setHeader("Content-Type", "application/json")
+    }
 }

@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -65,9 +66,11 @@ fun main(args: Array<String>) {
     TIMER =  Timer()
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("instance")!!)
+    val serverName = parser.getOrDefault("server-name", "Minecraft Scaleway Frontend")
+    val discord = DiscordWebhookAPI(parser.get("discord-webhook"), serverName)
 
     val server = MinecraftServer.init()
-    MinecraftServer.setBrandName(parser.getOrDefault("server-name", "Minecraft Scaleway Frontend"))
+    MinecraftServer.setBrandName(serverName)
 
     // make server use online mode
     MojangAuth.init()
@@ -111,7 +114,7 @@ fun main(args: Array<String>) {
                 LOGGER.info("Server were stopped in place, restarting it")
                 powerOffTask?.cancel()
             }
-            startServer(scaleway, pinger, instance, hostname, port)
+            startServer(scaleway, discord, pinger, instance, hostname, port)
         }.responseHandler {
             LOGGER.info {
                 val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
@@ -172,9 +175,10 @@ fun main(args: Array<String>) {
     }
 }
 
-fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
+fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
     LOGGER.info("Starting the server")
     instance.players.forEach { it.sendMessage(Component.text("Starting the server for you...")) }
+    discord.sendMessage(":arrows_counterclockwise: Starting the server")
     scaleway.startServer()
     TIMER.schedule(10*1000L, 10*1000L) {
         val state = scaleway.serverState()
@@ -184,15 +188,16 @@ fun startServer(scaleway: ScalewayAPI, pinger: () -> MCPing<MCPingResponse>, ins
         }
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
+        discord.sendMessage(":arrows_counterclockwise: Waiting for the Minecraft server")
 
-        setupServerTransfer(pinger, instance, hostname, port)
-        setupServerPowerOff(scaleway)
+        setupServerTransfer(discord, pinger, instance, hostname, port)
+        setupServerPowerOff(scaleway, discord)
 
         cancel()
     }
 }
 
-fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
+fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
     TIMER.schedule(15*1000L, 5*1000L) {
         pinger().exceptionHandler {
             LOGGER.info("Assuming that the Minecraft server is still starting...")
@@ -205,18 +210,20 @@ fun setupServerTransfer(pinger: () -> MCPing<MCPingResponse>, instance: Instance
                 }
                 it.sendPacket(TransferPacket(hostname, port))
             }
+            discord.sendMessage(":white_check_mark: Minecraft server started")
             cancel()
         }.sync
     }
 }
 
-fun setupServerPowerOff(scaleway: ScalewayAPI) {
+fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
     powerOffTask?.cancel()
     powerOffTask = object : TimerTask() {
         override fun run() {
             val state = scaleway.serverState()
             if (state != ScalewayAPI.ServerState.STOPPED_IN_PLACE) return
-            LOGGER.info("Powering off server (state: $state)")
+            LOGGER.info("Powering off server")
+            discord.sendMessage(":no_entry: Server stopped")
             scaleway.powerOffServer()
             cancel()
         }
