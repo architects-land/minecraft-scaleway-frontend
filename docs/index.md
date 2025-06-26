@@ -20,6 +20,6 @@ features:
   - title: Smart start
     details: Start the server only if needed!
   - title: Automatic shutdown
-    details: Shutdown the server to prevent unwanted cost.
+    details: Shutdown the server to avoid unwanted cost.
 ---
 

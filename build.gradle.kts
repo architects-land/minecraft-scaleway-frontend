@@ -40,7 +40,7 @@ kotlin {
 tasks {
     jar {
         manifest {
-            attributes["Main-Class"] = "world.anhgelus.world.architectsland.minecraftscalewayfrontend.Main"
+            attributes["Main-Class"] = "world.anhgelus.world.architectsland.minecraftscalewayfrontend.MainKt"
         }
     }
 
