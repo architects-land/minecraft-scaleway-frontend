@@ -33,7 +33,7 @@ CMD exec java -jar *.jar \
     --zone "$ZONE" \
     --instance "$INSTANCE" \
     --api-key "$API_KEY" \
-    --minecraft-host "$MINECRAFT_PORT" \
+    --minecraft-host "$MINECRAFT_HOST" \
     --minecraft-port "$MINECRAFT_PORT" \
     --server-name "$SERVER_NAME" \
     --whitelist "$WHITELIST" \

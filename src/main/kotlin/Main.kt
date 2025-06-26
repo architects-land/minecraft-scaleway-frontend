@@ -101,7 +101,7 @@ fun main(args: Array<String>) {
     val hostname = parser.get("minecraft-host")!!
     val port = parser.getIntOrDefault("minecraft-port", 25565)
 
-    val pinger = { MCPing.pingModern().address(hostname, port).timeout(2000, 2000) }
+    val pinger = { MCPing.pingModern().address(hostname, port).timeout(1000, 2000) }
 
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
@@ -220,6 +220,7 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
     TIMER.schedule(15*1000L, 5*1000L) {
         pinger().exceptionHandler {
             LOGGER.info("Assuming that the Minecraft server is still starting...")
+            LOGGER.trace("Trying to connect to $hostname:$port")
             LOGGER.trace("Pinger exception", it)
         }.responseHandler {
             instance.players.forEach {
