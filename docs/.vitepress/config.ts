@@ -10,19 +10,19 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting started', link: '/getting-started' },
       { text: 'How it works', link: '/how-it-works' },
+      { text: 'Getting started', link: '/getting-started' },
     ],
 
     sidebar: [
       {
         text: 'Usage',
         items: [
-          { text: 'Getting started', link: '/getting-started' },
           { text: 'How it works', link: '/how-it-works' },
-          { text: 'Server Stopper', link: '/server-stopper' },
+          { text: 'Getting started', link: '/getting-started' },
           { text: 'Maintain', link: '/maintain' },
           { text: 'Advanced configuration', link: '/advanced-configuration' },
+          { text: 'Server Stopper', link: '/server-stopper' },
         ]
       }
     ],

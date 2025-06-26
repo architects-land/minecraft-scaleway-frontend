@@ -8,11 +8,11 @@ hero:
   tagline: "Fake Minecraft Server used as a frontend to hourly paid Scaleway servers."
   actions:
     - theme: brand
-      text: Getting started
-      link: /getting-started
-    - theme: alt
       text: How it works?
       link: /how-it-works
+    - theme: alt
+      text: Getting started
+      link: /getting-started
 
 features:
   - title: Whitelist
