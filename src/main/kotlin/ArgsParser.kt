@@ -1,9 +1,21 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
-class ArgsParser(val args: Array<String>) {
+import java.nio.file.Files
+import java.nio.file.Path
+
+class ArgsParser(args: Array<String>) {
     val map: MutableMap<String, String> = mutableMapOf()
 
     init {
+        val lines = Files.lines(Path.of(".env"))
+        lines.forEach { line ->
+            if (line.startsWith("#") || line.isEmpty()) return@forEach
+            val splits = line.split("=")
+            if (splits.size != 2) throw IllegalArgumentException("Invalid line '$line' format in .env")
+            map[splits[0].trim().lowercase().replace("_", "-")] = splits[1].trim()
+        }
+        lines.close()
+
         var i = 0;
         while (i < args.size) {
             val current = args[i]
