@@ -21,11 +21,14 @@ import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
+import java.io.BufferedReader
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.stream.Collectors
 import kotlin.concurrent.schedule
 
 val LOGGER: Logger = LogManager.getLogger("world.anhgelus.world.architectsland.minecraftscalewayfrontend")
@@ -71,6 +74,17 @@ fun main(args: Array<String>) {
 
     val server = MinecraftServer.init()
     MinecraftServer.setBrandName(serverName)
+
+    var favicon: String? = null
+
+    try {
+        val lines = Files.lines(Path.of("server-icon.png"))
+        favicon = lines.collect(Collectors.joining("\n"))
+        lines.close()
+    } catch (e: IOException) {
+        LOGGER.info("Could not load server-icon.png")
+        LOGGER.trace(e)
+    }
 
     // make server use online mode
     MojangAuth.init()
@@ -142,6 +156,7 @@ fun main(args: Array<String>) {
         pinger().exceptionHandler {
             respData.setPlayersHidden(true)
             respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
+            if (favicon != null) respData.favicon = favicon
         }.responseHandler { data ->
             respData.description = Component.text(data.description)
             respData.maxPlayer = data.maxPlayers
