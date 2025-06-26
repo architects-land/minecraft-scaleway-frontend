@@ -70,7 +70,7 @@ User=minecraft
 WorkingDirectory=/var/minecraft
 
 # customize the CLI
-ExecStart=/usr/bin/java # command to start the server
+ExecStart=bash -c "/usr/bin/java" # command to start the server
 
 Restart=always
 #RestartSec=30
@@ -146,14 +146,10 @@ services:
     ports:
       - 25565:25565
     environment:
-      PORT: 25565
       ZONE: fr-par-2
       SERVER: 00000000-0000-0000-0000-000000000000
       API_KEY: 00000000-0000-0000-0000-000000000000
-      MINECRAFT_HOST: 198.51.100.0 # example IP
-      MINECRAFT_PORT: 25565
-      SERVER_NAME: "My frontend"
-      WHITELIST: anhgelus
+      MINECRAFT_HOST: 198.51.100.0
     volumes:
       - ./logs:/app/logs
 ```
