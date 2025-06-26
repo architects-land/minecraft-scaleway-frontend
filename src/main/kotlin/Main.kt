@@ -69,6 +69,8 @@ fun main(args: Array<String>) {
 
     val scaleway = ScalewayAPI(parser.get("api-key")!!, parser.get("zone")!!, parser.get("instance")!!)
     val serverName = parser.getOrDefault("server-name", "Minecraft Scaleway Frontend")
+    var webhook = parser.get("discord-webhook")
+    if (webhook != null && webhook.isEmpty()) webhook = null
     val discord = DiscordWebhookAPI(parser.get("discord-webhook"), serverName)
 
     val server = MinecraftServer.init()

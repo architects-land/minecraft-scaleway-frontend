@@ -24,6 +24,7 @@ ENV MINECRAFT_HOST=""
 ENV MINECRAFT_PORT=25565
 ENV SERVER_NAME="Minecraft Scaleway Frontend"
 ENV WHITELIST=""
+ENV DISCORD_WEBHOOK=""
 
 CMD exec java -jar *.jar \
     --port "$PORT" \
@@ -32,4 +33,5 @@ CMD exec java -jar *.jar \
     --minecraft-host "$MINECRAFT_PORT" \
     --minecraft-port "$MINECRAFT_PORT" \
     --server-name "$SERVER_NAME" \
-    --whitelist "$WHITELIST"
+    --whitelist "$WHITELIST" \
+    --discord-webhook "$DISCORD_WEBHOOK"
