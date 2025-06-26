@@ -26,7 +26,7 @@ You can pass these optionals arguments:
 - port of the Minecraft server (default: `25565`)
 - name of the server visible in the debug screen (default: `Minecraft Scaleway Frontend`)
 - whitelist (default: no whitelist), separate each user with a coma (`,`); you can use their Minecraft's username and their UUID
-- Discord Webhook's link to use when sending update
+- Discord Webhook's link to use when sending update (default: not connected to Discord)
 
 The icon used if the Minecraft server is offline is `server-icon.png`.
 It must follow [these rules](https://minecraft.wiki/w/Tutorial:Server_maintenance#Setting_the_server's_icon).

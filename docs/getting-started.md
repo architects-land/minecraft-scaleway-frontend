@@ -109,12 +109,6 @@ The server has 4 required arguments:
 - [instance's zone](https://www.scaleway.com/en/docs/instances/concepts/#availability-zone) (they call it "Availability Zones")
 - Minecraft's host that is used during the player's transfer; in most cases, this is the instance's IP
 
-You can pass these optionals arguments:
-- port of the server (default: `25565`)
-- port of the Minecraft server (default: `25565`)
-- name of the server visible in the debug screen (default: `Minecraft Scaleway Frontend`)
-- whitelist (default: no whitelist), separate each user with a coma (`,`); you can use their Minecraft's username and their UUID
-
 ### CLI
 
 ```bash
@@ -125,13 +119,7 @@ java -jar server.jar \
   --minecraft-host ip-of-minecraft-server
 ```
 
-You can also use `--port` to set the port of the server or `--minecraft-port` to set the port
-of the Minecraft server.
-
-You can modify the server name with `--server-name string` (use quotes if your string contains space).
-
-You can specify a whitelist with `--whitelist`, e.g.: `--whitelist anhgelus,ascpial`,
-`--whitelist anhgelus,3f6ddb7c-f214-48a9-9f4a-eb22b9cf53f0`.
+Check [advanced configuration](/advanced-configuration) for more information.
 
 ### Docker
 
@@ -142,15 +130,11 @@ Tags:
 - `main` is for the main branch
 - `v*` is for a specific tag (e.g., `v1.0.0`)
 
-Environments:
-- `PORT` is the server's port
+Required environments:
 - `ZONE` is the instance's zone
 - `INSTANCE` is the ID of the instance
 - `API_KEY` is your API key
 - `MINECRAFT_HOST` is the host of your Minecraft server
-- `MINECRAFT_PORT` is the port of your Minecraft server
-- `SERVER_NAME` is the name of this server
-- `WHITELIST` is the whitelist
 
 To save the logs, bind a volume to `/app/logs`.
 
@@ -173,6 +157,8 @@ services:
     volumes:
       - ./logs:/app/logs
 ```
+
+Check [advanced configuration](/advanced-configuration) for more information.
 
 ### Logs
 
