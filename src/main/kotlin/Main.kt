@@ -99,7 +99,7 @@ fun main(args: Array<String>) {
     val hostname = parser.get("minecraft-host")!!
     val port = parser.getIntOrDefault("minecraft-port", 25565)
 
-    val pinger = { MCPing.pingModern().address(hostname, port).timeout(500, 500) }
+    val pinger = { MCPing.pingModern().address(hostname, port).timeout(2000, 2000) }
 
     handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
