@@ -145,6 +145,7 @@ fun main(args: Array<String>) {
         }.responseHandler { data ->
             respData.description = Component.text(data.description)
             respData.maxPlayer = data.maxPlayers
+            respData.favicon = data.favicon
             data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.named(p.name)) }
         }.sync
     }
