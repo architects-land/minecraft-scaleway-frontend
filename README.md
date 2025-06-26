@@ -26,6 +26,10 @@ You can pass these optionals arguments:
 - port of the Minecraft server (default: `25565`)
 - name of the server visible in the debug screen (default: `Minecraft Scaleway Frontend`)
 - whitelist (default: no whitelist), separate each user with a coma (`,`); you can use their Minecraft's username and their UUID
+- Discord Webhook's link to use when sending update
+
+The icon used if the Minecraft server is offline is `server-icon.png`.
+It must follow [these rules](https://minecraft.wiki/w/Tutorial:Server_maintenance#Setting_the_server's_icon).
 
 Logs are in `logs/`.
 
@@ -50,6 +54,11 @@ You can modify the server name with `--server-name string` (use quotes if your s
 You specify a whitelist with `--whitelist`, e.g.: `--whitelist anhgelus,ascpial`, 
 `--whitelist anhgelus,3f6ddb7c-f214-48a9-9f4a-eb22b9cf53f0`.
 
+You can use a `.env` file to set these variables.
+It converts automatically `_` into `-`.
+Thus, `FOO_BAR=baz` will be loaded as `--foo-bar baz`.
+CLI args overrides the `.env` variables.
+
 ### Docker
 
 You can use the official Docker image `ghcr.io/architects-land/minecraft-scaleway-frontend`.
@@ -71,6 +80,8 @@ Environments:
 
 To save the logs, bind a volume to `/app/logs`.
 
+To use a custom icon, bind your icon to `/app/server-icon.png`.
+
 Example `docker-compose.yml`:
 ```yml
 services:
@@ -89,6 +100,7 @@ services:
       WHITELIST: anhgelus
     volumes:
       - ./logs:/app/logs
+      - ./server-icon.png:/app/server-icon.png
 ```
 
 ## Technology
