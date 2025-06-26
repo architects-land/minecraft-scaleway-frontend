@@ -26,6 +26,8 @@ ENV SERVER_NAME="Minecraft Scaleway Frontend"
 ENV WHITELIST=""
 ENV DISCORD_WEBHOOK=""
 
+EXPOSE 25565
+
 CMD exec java -jar *.jar \
     --port "$PORT" \
     --zone "$ZONE" \

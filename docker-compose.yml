@@ -1,0 +1,8 @@
+services:
+  frontend:
+    build: .
+    # image: ghcr.io/architects-land/minecraft-scaleway-frontend:main
+    env_file:
+      - .env
+    ports:
+      - "25565:25565"

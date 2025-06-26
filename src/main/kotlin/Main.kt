@@ -61,8 +61,13 @@ fun main(args: Array<String>) {
     var whitelist: List<String>? = null
     var whitelistEnabled = parser.has("whitelist")
     if (whitelistEnabled) {
-        whitelist = parser.get("whitelist")!!.split(",")
-        if (whitelist.isEmpty()) whitelistEnabled = false
+        val p = parser.get("whitelist")!!
+        if (p.isEmpty()) {
+            whitelistEnabled = false
+        } else {
+            whitelist = p.split(",")
+            if (whitelist.isEmpty()) whitelistEnabled = false
+        }
     }
 
     TIMER =  Timer()
@@ -71,20 +76,17 @@ fun main(args: Array<String>) {
     val serverName = parser.getOrDefault("server-name", "Minecraft Scaleway Frontend")
     var webhook = parser.get("discord-webhook")
     if (webhook != null && webhook.isEmpty()) webhook = null
-    val discord = DiscordWebhookAPI(parser.get("discord-webhook"), serverName)
+    val discord = DiscordWebhookAPI(webhook, serverName)
 
     val server = MinecraftServer.init()
     MinecraftServer.setBrandName(serverName)
 
     var favicon: String? = null
-
-    try {
-        val lines = Files.lines(Path.of("server-icon.png"))
+    val faviconPath = Path.of("server-icon.png")
+    if (Files.exists(faviconPath)) {
+        val lines = Files.lines(faviconPath)
         favicon = lines.collect(Collectors.joining("\n"))
         lines.close()
-    } catch (e: IOException) {
-        LOGGER.info("Could not load server-icon.png")
-        LOGGER.trace(e)
     }
 
     // make server use online mode

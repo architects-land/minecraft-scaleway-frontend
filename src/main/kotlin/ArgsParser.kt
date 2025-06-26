@@ -1,6 +1,5 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend
 
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -8,8 +7,9 @@ class ArgsParser(args: Array<String>) {
     val map: MutableMap<String, String> = mutableMapOf()
 
     init {
-        try {
-            val lines = Files.lines(Path.of(".env"))
+        val envPath = Path.of(".env")
+        if (Files.exists(envPath)) {
+            val lines = Files.lines(envPath)
             lines.forEach { line ->
                 if (line.startsWith("#") || line.isEmpty()) return@forEach
                 val splits = line.split("=")
@@ -17,7 +17,7 @@ class ArgsParser(args: Array<String>) {
                 map[splits[0].trim().lowercase().replace("_", "-")] = splits[1].trim()
             }
             lines.close()
-        } catch (_: IOException) { }
+        }
 
         var i = 0;
         while (i < args.size) {
