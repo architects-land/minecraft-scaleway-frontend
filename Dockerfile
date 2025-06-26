@@ -18,7 +18,7 @@ COPY --from=builder /app/build/libs/*.jar .
 
 ENV PORT=25565
 ENV ZONE="fr-par-1"
-ENV SERVER=""
+ENV INSTANCE=""
 ENV API_KEY=""
 ENV MINECRAFT_HOST=""
 ENV MINECRAFT_PORT=25565
@@ -29,7 +29,7 @@ ENV DISCORD_WEBHOOK=""
 CMD exec java -jar *.jar \
     --port "$PORT" \
     --zone "$ZONE" \
-    --server "$SERVER" \
+    --instance "$INSTANCE" \
     --minecraft-host "$MINECRAFT_PORT" \
     --minecraft-port "$MINECRAFT_PORT" \
     --server-name "$SERVER_NAME" \
