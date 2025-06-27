@@ -109,6 +109,15 @@ The server has 4 required arguments:
 - [instance's zone](https://www.scaleway.com/en/docs/instances/concepts/#availability-zone) (they call it "Availability Zones")
 - Minecraft's host that is used during the player's transfer; in most cases, this is the instance's IP
 
+### Version
+
+Each version of the project supports only one version of Minecraft.
+The supported version is indicated in its name.
+For example, `1.0.0+1.21.6` supports Minecraft 1.21.6 and `1.1.0+1.21.7` supports Minecraft 1.21.7.
+
+The "first version" (i.e. the thing *before* the `+`) is the version of the server.
+The "second version" (i.e. the thing *after* the `+`) is the version of Minecraft.
+
 ### CLI
 
 ```bash

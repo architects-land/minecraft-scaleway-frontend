@@ -37,6 +37,12 @@ The current logs are in `latest.log`.
 This file is compressed with GZip when the program is stopped.
 Its new name is `yyyy-MM-dd HH:mm.log.gz` (program launch date).
 
+### Version
+
+Each version of the project supports only one version of Minecraft.
+The supported version is indicated in its name.
+For example, `1.0.0+1.21.6` supports Minecraft 1.21.6 and `1.1.0+1.21.7` supports Minecraft 1.21.7.
+
 ### CLI
 ```bash
 java -jar server.jar \
