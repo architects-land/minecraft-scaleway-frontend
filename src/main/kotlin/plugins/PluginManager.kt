@@ -1,5 +1,6 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
 
+import net.lenni0451.mcping.responses.MCPingResponse
 import net.minestom.server.entity.Player
 import net.minestom.server.event.GlobalEventHandler
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
@@ -90,5 +91,9 @@ object PluginManager : PluginHelper {
 
     fun emitInstanceStarted() {
         listeners.forEach { it.onInstanceStart() }
+    }
+
+    fun emitMinecraftStarted(ping: MCPingResponse) {
+        listeners.forEach { it.onMinecraftStarted(ping) }
     }
 }

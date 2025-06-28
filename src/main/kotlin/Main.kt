@@ -230,13 +230,14 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
             LOGGER.trace("Trying to connect to $hostname:$port")
             LOGGER.trace("Pinger exception", it)
         }.responseHandler {
-            instance.players.forEach {
-                if (PluginManager.emitTransfer(it)) return@forEach
+            PluginManager.emitMinecraftStarted(it)
+            instance.players.forEach { p ->
+                if (PluginManager.emitTransfer(p)) return@forEach
                 LOGGER.info {
-                    val name = PlainTextComponentSerializer.plainText().serialize(it.name)
-                    ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, it.uuid)
+                    val name = PlainTextComponentSerializer.plainText().serialize(p.name)
+                    ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, p.uuid)
                 }
-                it.sendPacket(TransferPacket(hostname, port))
+                p.sendPacket(TransferPacket(hostname, port))
             }
             discord.sendMessage(":white_check_mark: Minecraft server started")
             cancel()

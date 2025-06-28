@@ -1,5 +1,6 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.api
 
+import net.lenni0451.mcping.responses.MCPingResponse
 import net.minestom.server.entity.Player
 
 abstract class EventListener {
@@ -23,4 +24,9 @@ abstract class EventListener {
      * Called when the instance is started
      */
     fun onInstanceStarted() {}
+
+    /**
+     * Called when the Minecraft server is started
+     */
+    fun onMinecraftStarted(ping: MCPingResponse) {}
 }
