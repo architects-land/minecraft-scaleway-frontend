@@ -1,6 +1,10 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
 
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
 import java.io.File
+import java.net.URI
+import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.jar.JarEntry
@@ -9,6 +13,7 @@ import kotlin.io.path.exists
 
 object PluginManager {
     private val files = ArrayList<PluginData>()
+    private val loaded = ArrayList<Plugin>()
 
     fun init() {
         val results: MutableList<File> = ArrayList()
@@ -37,5 +42,25 @@ object PluginManager {
             jar.close()
             ins.close()
         }
+    }
+
+    fun start(): Int {
+        var c = 0;
+        files.forEach {
+            try {
+                val loader = URLClassLoader.newInstance(arrayOf(URI("jar:file:${it.filename}!/").toURL()))
+                val pl = loader.loadClass(it.main).getDeclaredConstructor().newInstance() as Plugin
+                pl.onLoad()
+                loaded.add(pl)
+                c++
+            } catch (e: Exception) {
+                LOGGER.error("Error while loading ${it.filename}", e)
+            }
+        }
+        return c
+    }
+
+    fun stop() {
+        loaded.forEach { it.onUnload() }
     }
 }

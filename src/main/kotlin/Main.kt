@@ -22,7 +22,6 @@ import sun.misc.Signal
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins.PluginManager
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -180,6 +179,8 @@ fun main(args: Array<String>) {
     commands.register(InfoCommand(scaleway, pinger))
     commands.register(ConnectCommand(pinger, hostname, port))
 
+    PluginManager.start()
+
     server.start("0.0.0.0", parser.getIntOrDefault("port", 25565))
     LOGGER.info("Minecraft Scaleway Frontend started")
 
@@ -187,6 +188,7 @@ fun main(args: Array<String>) {
         Signal.handle(Signal(signalName)) { signal ->
             runBlocking {
                 LOGGER.info("Stopping...")
+                PluginManager.stop()
                 MinecraftServer.stopCleanly()
                 TIMER.cancel()
                 LOGGER.info("Stopped")
