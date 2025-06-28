@@ -1,8 +1,9 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
 
+import net.minestom.server.entity.Player
 import net.minestom.server.event.GlobalEventHandler
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.event.EventListener
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.EventListener
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.PluginHelper
 import java.io.File
@@ -77,5 +78,9 @@ object PluginManager : PluginHelper {
 
     override fun getMinecraftEventHandler(): GlobalEventHandler {
         return handler
+    }
+
+    fun emitOnTransfer(p: Player): Boolean {
+        return listeners.any { it.onTransfer(p) }
     }
 }

@@ -58,8 +58,6 @@ fun main(args: Array<String>) {
         return
     }
 
-    PluginManager.init()
-
     var whitelist: List<String>? = null
     var whitelistEnabled = parser.has("whitelist")
     if (whitelistEnabled) {
@@ -94,11 +92,12 @@ fun main(args: Array<String>) {
     // make server use online mode
     MojangAuth.init()
 
+    val handler = MinecraftServer.getGlobalEventHandler()
+    PluginManager.init(handler)
+
     val instanceManager = MinecraftServer.getInstanceManager()
 
     val instance = instanceManager.createInstanceContainer(DimensionType.THE_END)
-
-    val handler = MinecraftServer.getGlobalEventHandler()
 
     val hostname = parser.get("minecraft-host")!!
     val port = parser.getIntOrDefault("minecraft-port", 25565)
@@ -135,6 +134,7 @@ fun main(args: Array<String>) {
             }
             startServer(scaleway, discord, pinger, instance, hostname, port)
         }.responseHandler {
+            if (PluginManager.emitOnTransfer(player)) return@responseHandler
             LOGGER.info {
                 val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
                 ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, player.uuid)
@@ -229,6 +229,7 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
             LOGGER.trace("Pinger exception", it)
         }.responseHandler {
             instance.players.forEach {
+                if (PluginManager.emitOnTransfer(it)) return@forEach
                 LOGGER.info {
                     val name = PlainTextComponentSerializer.plainText().serialize(it.name)
                     ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, it.uuid)
