@@ -21,6 +21,7 @@ import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins.PluginManager
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -57,6 +58,8 @@ fun main(args: Array<String>) {
         LOGGER.error("Specify the ip address of the minecraft server")
         return
     }
+
+    PluginManager.init()
 
     var whitelist: List<String>? = null
     var whitelistEnabled = parser.has("whitelist")
