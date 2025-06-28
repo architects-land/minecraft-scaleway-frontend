@@ -7,6 +7,8 @@ import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.EventListener
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.PluginHelper
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
 import java.io.File
 import java.net.URI
 import java.net.URLClassLoader
@@ -21,9 +23,13 @@ object PluginManager : PluginHelper {
     private val loaded = ArrayList<Plugin>()
     private val listeners = mutableListOf<EventListener>()
     private lateinit var handler: GlobalEventHandler
+    private lateinit var discord: DiscordWebhookAPI
+    private lateinit var scaleway: ScalewayAPI
 
-    fun init(handler: GlobalEventHandler) {
+    fun init(handler: GlobalEventHandler, scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
         this.handler = handler
+        this.scaleway = scaleway
+        this.discord = discord
 
         val results: MutableList<File> = ArrayList()
 
@@ -79,6 +85,14 @@ object PluginManager : PluginHelper {
 
     override fun getMinecraftEventHandler(): GlobalEventHandler {
         return handler
+    }
+
+    override fun getDiscordWebhook(): DiscordWebhookAPI {
+        return discord
+    }
+
+    override fun getScalewayAPI(): ScalewayAPI {
+        return scaleway
     }
 
     fun emitTransfer(p: Player): Boolean {
