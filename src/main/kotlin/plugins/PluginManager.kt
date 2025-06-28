@@ -1,10 +1,8 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
 
-import net.lenni0451.mcping.responses.MCPingResponse
-import net.minestom.server.entity.Player
-import net.minestom.server.event.GlobalEventHandler
+import net.minestom.server.event.Event
+import net.minestom.server.event.EventNode
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.EventListener
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.PluginHelper
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
@@ -18,16 +16,15 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import kotlin.io.path.exists
 
-object PluginManager : PluginHelper {
-    private val files = ArrayList<PluginData>()
-    private val loaded = ArrayList<Plugin>()
-    private val listeners = mutableListOf<EventListener>()
-    private lateinit var handler: GlobalEventHandler
+object PluginManager {
+    private val pluginData = ArrayList<PluginData>()
+    private val loaded = ArrayList< Pair<Plugin, String> >()
+    private lateinit var node: EventNode<Event>
     private lateinit var discord: DiscordWebhookAPI
     private lateinit var scaleway: ScalewayAPI
 
-    fun init(handler: GlobalEventHandler, scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
-        this.handler = handler
+    fun init(node: EventNode<Event>, scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
+        this.node = node
         this.scaleway = scaleway
         this.discord = discord
 
@@ -53,7 +50,7 @@ object PluginManager : PluginHelper {
             val ins = jar.getInputStream(conf)
                 ?: throw InvalidPluginException(InvalidPluginException.Reason.INVALID_PLUGIN_YML, "empty")
             val data = PluginData.fromJson(ins.readBytes().toString(Charsets.UTF_8), it.path)
-            files.add(data)
+            pluginData.add(data)
             jar.close()
             ins.close()
         }
@@ -61,12 +58,12 @@ object PluginManager : PluginHelper {
 
     fun start(): Int {
         var c = 0
-        files.forEach {
+        pluginData.forEach {
             try {
                 val loader = URLClassLoader.newInstance(arrayOf(URI("jar:file:${it.filename}!/").toURL()))
                 val pl = loader.loadClass(it.main).getDeclaredConstructor().newInstance() as Plugin
-                pl.onLoad(this)
-                loaded.add(pl)
+                pl.onLoad(Helper(it.name))
+                loaded.add(Pair(pl, it.name))
                 c++
             } catch (e: Exception) {
                 LOGGER.error("Error while loading ${it.filename}", e)
@@ -76,46 +73,26 @@ object PluginManager : PluginHelper {
     }
 
     fun stop() {
-        loaded.forEach { it.onUnload(this) }
+        loaded.forEach { it.first.onUnload(Helper(it.second)) }
     }
 
-    override fun registerListener(listener: EventListener) {
-        listeners.add(listener)
-    }
+    private class Helper(val name: String) : PluginHelper {
+        val cNode: EventNode<Event> = EventNode.all(name)
 
-    override fun getMinecraftEventHandler(): GlobalEventHandler {
-        return handler
-    }
+        init {
+            node.addChild(cNode)
+        }
 
-    override fun getDiscordWebhook(): DiscordWebhookAPI {
-        return discord
-    }
+        override fun getEventNode(): EventNode<Event> {
+            return cNode
+        }
 
-    override fun getScalewayAPI(): ScalewayAPI {
-        return scaleway
-    }
+        override fun getDiscordWebhook(): DiscordWebhookAPI {
+            return discord
+        }
 
-    fun emitTransfer(p: Player): Boolean {
-        return listeners.any { it.onTransfer(p) }
-    }
-
-    fun emitInstanceStart(): Boolean {
-        return listeners.any { it.onInstanceStart() }
-    }
-
-    fun emitInstanceStarted() {
-        listeners.forEach { it.onInstanceStarted() }
-    }
-
-    fun emitMinecraftStarted(ping: MCPingResponse) {
-        listeners.forEach { it.onMinecraftStarted(ping) }
-    }
-
-    fun emitInstanceStop(): Boolean {
-        return listeners.any { it.onInstanceStop() }
-    }
-
-    fun emitInstanceStopped() {
-        listeners.forEach { it.onInstanceStopped() }
+        override fun getScalewayAPI(): ScalewayAPI {
+            return scaleway
+        }
     }
 }

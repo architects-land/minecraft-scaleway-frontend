@@ -35,7 +35,7 @@ will block the Scaleway's instance to start.
 
 To inform Minecraft Scaleway Frontend to call the listener, you must register it via the `PluginHelper`.
 This interface is given during the load and the unload event (in your main class).
-Use the method `PluginHelper::registerListener(EventListener)` to register your listener.
+Use the method `PluginHelper#registerListener(EventListener)` to register your listener.
 ```kotlin
 fun onLoad(helper: PluginHelper) {
     helper.registerListener(MyListener)
@@ -48,7 +48,7 @@ You can register an event during the unload event, but I don't know why you want
 
 ## Listening to Minestom's event
 
-You can the `GlobalEventHandler` from Minestom with `PluginHelper::getMinecraftEventHandler()`.
+You can the `GlobalEventHandler` from Minestom with `PluginHelper#getMinecraftEventHandler()`.
 
 Check [their documentation](https://minestom.net/docs/feature/events) for more information.
 
