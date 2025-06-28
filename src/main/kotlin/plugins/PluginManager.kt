@@ -1,5 +1,6 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
 
+import net.minestom.server.event.GlobalEventHandler
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.event.EventListener
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
@@ -16,9 +17,12 @@ import kotlin.io.path.exists
 object PluginManager : PluginHelper {
     private val files = ArrayList<PluginData>()
     private val loaded = ArrayList<Plugin>()
-    val listeners = mutableListOf<EventListener>()
+    private val listeners = mutableListOf<EventListener>()
+    private lateinit var handler: GlobalEventHandler
 
-    fun init() {
+    fun init(handler: GlobalEventHandler) {
+        this.handler = handler
+
         val results: MutableList<File> = ArrayList()
 
         val path = Paths.get("./plugins")
@@ -69,5 +73,9 @@ object PluginManager : PluginHelper {
 
     override fun registerListener(listener: EventListener) {
         listeners.add(listener)
+    }
+
+    override fun getMinecraftEventHandler(): GlobalEventHandler {
+        return handler
     }
 }
