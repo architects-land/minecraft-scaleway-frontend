@@ -52,7 +52,7 @@ object PluginManager : PluginHelper {
                 ?: throw InvalidPluginException(InvalidPluginException.Reason.INVALID_PLUGIN_YML, "not found")
             val ins = jar.getInputStream(conf)
                 ?: throw InvalidPluginException(InvalidPluginException.Reason.INVALID_PLUGIN_YML, "empty")
-            val data = PluginData.fromJson(ins.readBytes().toString(Charsets.UTF_8), it.name)
+            val data = PluginData.fromJson(ins.readBytes().toString(Charsets.UTF_8), it.path)
             files.add(data)
             jar.close()
             ins.close()
