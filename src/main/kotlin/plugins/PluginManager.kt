@@ -90,10 +90,18 @@ object PluginManager : PluginHelper {
     }
 
     fun emitInstanceStarted() {
-        listeners.forEach { it.onInstanceStart() }
+        listeners.forEach { it.onInstanceStarted() }
     }
 
     fun emitMinecraftStarted(ping: MCPingResponse) {
         listeners.forEach { it.onMinecraftStarted(ping) }
+    }
+
+    fun emitInstanceStop(): Boolean {
+        return listeners.any { it.onInstanceStop() }
+    }
+
+    fun emitInstanceStopped() {
+        listeners.forEach { it.onInstanceStopped() }
     }
 }

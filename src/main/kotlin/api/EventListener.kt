@@ -29,4 +29,16 @@ abstract class EventListener {
      * Called when the Minecraft server is started
      */
     fun onMinecraftStarted(ping: MCPingResponse) {}
+
+    /**
+     * Called when the instance is requested to stop
+     */
+    fun onInstanceStop(): Boolean {
+        return false
+    }
+
+    /**
+     * Called when the instance is stopped
+     */
+    fun onInstanceStopped() {}
 }

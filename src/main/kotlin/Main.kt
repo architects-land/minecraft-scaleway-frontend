@@ -246,6 +246,7 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
 }
 
 fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
+    if (PluginManager.emitInstanceStop()) return
     powerOffTask?.cancel()
     powerOffTask = object : TimerTask() {
         override fun run() {
@@ -254,6 +255,7 @@ fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
             LOGGER.info("Powering off server")
             discord.sendMessage(":no_entry: Server stopped")
             scaleway.powerOffServer()
+            PluginManager.emitInstanceStopped()
             cancel()
         }
     }
