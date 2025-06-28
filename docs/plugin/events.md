@@ -1,61 +1,33 @@
 # Events
 
 To perform any actions, the plugin must listen to events.
-There are two kinds of events: Minecraft Scaleway Frontend's event and Minestom's event.
+Minecraft Scaleway Frontend uses Minestom's framework to send custom events.
 
-Minecraft Scaleway Frontend's events are managed and added by the server. 
-These are useful to manage how Minecraft Scaleway Frontend works.  
+## Listening events
 
-Minestom's events are managed by Minestom, the framework behind the Minecraft server.
-With this, you can handle how the Minecraft server works.
+Check [Minestom documentation](https://minestom.net/docs/feature/events) for more information.
 
-:::warning
-Be careful when you are using Minestom's event: you can break Minecraft Scaleway Frontend.
-:::
-
-## Listening to Minecraft Scaleway Frontend's event
-
-A listener is a class inheriting from `EventListener`.
-To listen to a specific event, just override the method.
-
-There are two kinds of events: the cancellable and the non-cancellable ones.
-
-A non-cancellable event returns nothing.
-A cancellable event returns a boolean: false if the event is the not cancelled and true if it is.
-
-For example, this listener
+To create a handler, you must get your plugin's node with `PluginHelper#getEventNode()`.
+Then, you can register a listener with `EventNode<E>#addListener(Class<E>, Consumer<Class<E>>)`, e.g.
 ```kotlin
-object MyListener : EventListener {
-    override fun onInstanceStart(): Boolean {
-        return true
-    }
-}
-```
-will block the Scaleway's instance to start.
-
-To inform Minecraft Scaleway Frontend to call the listener, you must register it via the `PluginHelper`.
-This interface is given during the load and the unload event (in your main class).
-Use the method `PluginHelper#registerListener(EventListener)` to register your listener.
-```kotlin
-fun onLoad(helper: PluginHelper) {
-    helper.registerListener(MyListener)
+val node = helper.getEventNode()
+node.addListener(TransferEvent.class) { event ->
+    // your code
 }
 ```
 
-:::info
-You can register an event during the unload event, but I don't know why you want to do this.
+Usually, this is done during the load process, but you can do it during the unload process!
+(I don't know why you could use this "feature".)
+
+:::tip
+Every custom event is in the package `world.anhgelus.architectsland.minecraftscalewayfrontend.event`.
 :::
 
-## Listening to Minestom's event
+## What's hidden behind
 
-You can the `GlobalEventHandler` from Minestom with `PluginHelper#getMinecraftEventHandler()`.
+Minestom uses a tree to represent event handlers.
 
-Check [their documentation](https://minestom.net/docs/feature/events) for more information.
-
-Minecraft Scaleway Frontend uses:
-- `AsyncPlayerConfigurationEvent`
-- `PlayerSpawnEvent`
-- `PlayerDisconnectEvent`
-- `PlayerChatEvent`
-- `ServerListPingEvent`
-- `PlayerCommandEvent`
+Each plugin has their own node with their handlers.
+These are grouped in a super node that is contained in the root node.
+The server's handlers are in the root node.
+With this architecture, a plugin cannot break the server.
