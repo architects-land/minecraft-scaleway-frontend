@@ -1,8 +1,8 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.http
+package world.anhgelus.architectsland.minecraftscalewayfrontend.http
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
+import world.anhgelus.architectsland.minecraftscalewayfrontend.LOGGER
 import java.net.http.HttpRequest
 
 class DiscordWebhookAPI(private val url: String?, val username: String? = null) : HttpAPI() {

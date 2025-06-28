@@ -1,4 +1,4 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend
+package world.anhgelus.architectsland.minecraftscalewayfrontend
 
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
@@ -20,15 +20,15 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.event.InstanceStartEvent
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.event.InstanceStartedEvent
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.event.InstanceStopEvent
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.event.InstanceStoppedEvent
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.event.MinecraftStartedEvent
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.event.TransferEvent
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins.PluginManager
+import world.anhgelus.architectsland.minecraftscalewayfrontend.event.InstanceStartEvent
+import world.anhgelus.architectsland.minecraftscalewayfrontend.event.InstanceStartedEvent
+import world.anhgelus.architectsland.minecraftscalewayfrontend.event.InstanceStopEvent
+import world.anhgelus.architectsland.minecraftscalewayfrontend.event.InstanceStoppedEvent
+import world.anhgelus.architectsland.minecraftscalewayfrontend.event.MinecraftStartedEvent
+import world.anhgelus.architectsland.minecraftscalewayfrontend.event.TransferEvent
+import world.anhgelus.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
+import world.anhgelus.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
+import world.anhgelus.architectsland.minecraftscalewayfrontend.plugins.PluginManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime

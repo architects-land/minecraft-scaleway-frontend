@@ -1,4 +1,4 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
+package world.anhgelus.architectsland.minecraftscalewayfrontend.plugins
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

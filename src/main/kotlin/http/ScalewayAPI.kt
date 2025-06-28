@@ -1,12 +1,8 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.http
+package world.anhgelus.architectsland.minecraftscalewayfrontend.http
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
-import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 
 class ScalewayAPI(private val apiKey: String, val zone: String, val server: String) : HttpAPI() {
     @Serializable

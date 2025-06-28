@@ -1,4 +1,4 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.event
+package world.anhgelus.architectsland.minecraftscalewayfrontend.event
 
 import net.minestom.server.event.Event
 

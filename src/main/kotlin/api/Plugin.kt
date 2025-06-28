@@ -1,4 +1,4 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.api
+package world.anhgelus.architectsland.minecraftscalewayfrontend.api
 
 interface Plugin {
     fun onLoad(helper: PluginHelper)

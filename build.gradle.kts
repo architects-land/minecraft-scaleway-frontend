@@ -4,7 +4,7 @@ plugins {
     kotlin("plugin.serialization") version "2.1.20"
 }
 
-group = "world.anhgelus.world.architectsland.minecraftscalewayfrontend"
+group = "world.anhgelus.architectsland.minecraftscalewayfrontend"
 version = "1.0.0"
 
 repositories {

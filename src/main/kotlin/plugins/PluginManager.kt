@@ -1,12 +1,12 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
+package world.anhgelus.architectsland.minecraftscalewayfrontend.plugins
 
 import net.minestom.server.event.Event
 import net.minestom.server.event.EventNode
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.PluginHelper
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
+import world.anhgelus.architectsland.minecraftscalewayfrontend.LOGGER
+import world.anhgelus.architectsland.minecraftscalewayfrontend.api.Plugin
+import world.anhgelus.architectsland.minecraftscalewayfrontend.api.PluginHelper
+import world.anhgelus.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
+import world.anhgelus.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
 import java.io.File
 import java.net.URI
 import java.net.URLClassLoader
