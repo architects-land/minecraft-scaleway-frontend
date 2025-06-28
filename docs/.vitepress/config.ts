@@ -30,6 +30,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/plugin/introduction' },
           { text: 'Create a plugin', link: '/plugin/create-a-plugin' },
+          { text: 'Events', link: '/plugin/events' },
         ]
       }
     ],

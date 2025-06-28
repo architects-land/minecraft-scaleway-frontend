@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
 import java.net.http.HttpRequest
 
-class DiscordWebhookAPI(val url: String?, val username: String? = null) : HttpAPI() {
+class DiscordWebhookAPI(private val url: String?, val username: String? = null) : HttpAPI() {
     @Serializable
     data class WebhookContent(val content: String, val username: String? = null)
 

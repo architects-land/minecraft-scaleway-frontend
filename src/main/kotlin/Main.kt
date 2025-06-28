@@ -93,7 +93,7 @@ fun main(args: Array<String>) {
     MojangAuth.init()
 
     val handler = MinecraftServer.getGlobalEventHandler()
-    PluginManager.init(handler)
+    PluginManager.init(handler, scaleway, discord)
 
     val instanceManager = MinecraftServer.getInstanceManager()
 

@@ -45,4 +45,16 @@ This file contains every important information about your plugin.
 ```
 `main` must be the reference to your main class!
 
-Now, your plugin can be loaded by the server. 
+Now, your plugin can be loaded by the server.
+
+## Using internal API
+
+You can get server's internal API by using the interface `PluginHelper` given during the load and the unload event.
+
+`PluginHelper::getDiscordWebhook()` gives you a class to communicate with Discord via the webhook.
+
+`PluginHelper::getScalewayAPI()` gives you a class to communicate with Scaleway via their API.
+
+:::danger Scaleway API
+Be aware that a bad usage of this API could increase the costs of the owner.
+:::
