@@ -1,7 +1,9 @@
 package world.anhgelus.world.architectsland.minecraftscalewayfrontend.plugins
 
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.event.EventListener
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.Plugin
+import world.anhgelus.world.architectsland.minecraftscalewayfrontend.api.PluginHelper
 import java.io.File
 import java.net.URI
 import java.net.URLClassLoader
@@ -11,9 +13,10 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import kotlin.io.path.exists
 
-object PluginManager {
+object PluginManager : PluginHelper {
     private val files = ArrayList<PluginData>()
     private val loaded = ArrayList<Plugin>()
+    val listeners = mutableListOf<EventListener>()
 
     fun init() {
         val results: MutableList<File> = ArrayList()
@@ -45,12 +48,12 @@ object PluginManager {
     }
 
     fun start(): Int {
-        var c = 0;
+        var c = 0
         files.forEach {
             try {
                 val loader = URLClassLoader.newInstance(arrayOf(URI("jar:file:${it.filename}!/").toURL()))
                 val pl = loader.loadClass(it.main).getDeclaredConstructor().newInstance() as Plugin
-                pl.onLoad()
+                pl.onLoad(this)
                 loaded.add(pl)
                 c++
             } catch (e: Exception) {
@@ -62,5 +65,9 @@ object PluginManager {
 
     fun stop() {
         loaded.forEach { it.onUnload() }
+    }
+
+    override fun registerListener(listener: EventListener) {
+        listeners.add(listener)
     }
 }
