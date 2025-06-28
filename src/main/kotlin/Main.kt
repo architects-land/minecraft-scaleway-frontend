@@ -134,7 +134,7 @@ fun main(args: Array<String>) {
             }
             startServer(scaleway, discord, pinger, instance, hostname, port)
         }.responseHandler {
-            if (PluginManager.emitOnTransfer(player)) return@responseHandler
+            if (PluginManager.emitTransfer(player)) return@responseHandler
             LOGGER.info {
                 val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
                 ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, player.uuid)
@@ -200,6 +200,7 @@ fun main(args: Array<String>) {
 }
 
 fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
+    if (PluginManager.emitInstanceStart()) return
     LOGGER.info("Starting the server")
     instance.players.forEach { it.sendMessage(Component.text("Starting the server for you...")) }
     discord.sendMessage(":arrows_counterclockwise: Starting the server")
@@ -210,6 +211,7 @@ fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () ->
             LOGGER.info("Server is still starting... Current state: $state")
             return@schedule
         }
+        PluginManager.emitInstanceStarted()
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
         discord.sendMessage(":arrows_counterclockwise: Waiting for the Minecraft server")
@@ -229,7 +231,7 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
             LOGGER.trace("Pinger exception", it)
         }.responseHandler {
             instance.players.forEach {
-                if (PluginManager.emitOnTransfer(it)) return@forEach
+                if (PluginManager.emitTransfer(it)) return@forEach
                 LOGGER.info {
                     val name = PlainTextComponentSerializer.plainText().serialize(it.name)
                     ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, it.uuid)

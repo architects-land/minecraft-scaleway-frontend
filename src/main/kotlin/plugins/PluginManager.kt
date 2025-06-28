@@ -80,7 +80,15 @@ object PluginManager : PluginHelper {
         return handler
     }
 
-    fun emitOnTransfer(p: Player): Boolean {
+    fun emitTransfer(p: Player): Boolean {
         return listeners.any { it.onTransfer(p) }
+    }
+
+    fun emitInstanceStart(): Boolean {
+        return listeners.any { it.onInstanceStart() }
+    }
+
+    fun emitInstanceStarted() {
+        listeners.forEach { it.onInstanceStart() }
     }
 }
