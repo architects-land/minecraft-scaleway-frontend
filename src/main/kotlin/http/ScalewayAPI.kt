@@ -8,7 +8,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class ScalewayAPI(val apiKey: String, val zone: String, val server: String) : HttpAPI() {
+class ScalewayAPI(private val apiKey: String, val zone: String, val server: String) : HttpAPI() {
     @Serializable
     data class Server(val id: String, val name: String, val state: String)
 
