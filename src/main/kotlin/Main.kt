@@ -43,8 +43,6 @@ lateinit var TIMER: Timer
 
 private var powerOffTask: TimerTask? = null
 
-private val eventNode = EventNode.all("minecraft-scaleway-frontend")
-
 fun main(args: Array<String>) {
     LOGGER.info("Minecraft Scaleway Frontend launched")
     val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
@@ -104,6 +102,9 @@ fun main(args: Array<String>) {
     val childrenNode = EventNode.all("children")
     PluginManager.init(childrenNode, scaleway, discord)
 
+    val handler = MinecraftServer.getGlobalEventHandler()
+    handler.addChild(childrenNode)
+
     val instanceManager = MinecraftServer.getInstanceManager()
 
     val instance = instanceManager.createInstanceContainer(DimensionType.THE_END)
@@ -113,7 +114,7 @@ fun main(args: Array<String>) {
 
     val pinger = { MCPing.pingModern().address(hostname, port).timeout(1000, 2000) }
 
-    eventNode.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
+    handler.addListener(AsyncPlayerConfigurationEvent::class.java) { event ->
         val player = event.player
         val name = PlainTextComponentSerializer.plainText().serialize(player.name)
         if (whitelistEnabled && !whitelist!!.any { name == it || player.uuid.toString() == it }) {
@@ -127,7 +128,7 @@ fun main(args: Array<String>) {
         player.gameMode = GameMode.SPECTATOR
     }
 
-    eventNode.addListener(PlayerSpawnEvent::class.java) { event ->
+    handler.addListener(PlayerSpawnEvent::class.java) { event ->
         val player = event.player
         pinger().exceptionHandler {
             val state = scaleway.serverState()
@@ -144,7 +145,7 @@ fun main(args: Array<String>) {
             startServer(scaleway, discord, pinger, instance, hostname, port)
         }.responseHandler {
             val e = TransferEvent(player)
-            eventNode.call(e)
+            handler.call(e)
             if (e.isCancelled) return@responseHandler
 
             LOGGER.info {
@@ -155,19 +156,19 @@ fun main(args: Array<String>) {
         }.sync
     }
 
-    eventNode.addListener(PlayerDisconnectEvent::class.java) { event ->
+    handler.addListener(PlayerDisconnectEvent::class.java) { event ->
         LOGGER.info {
             val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
             ParameterizedMessage("Player {} ({}) disconnected", name, event.player.uuid)
         }
     }
 
-    eventNode.addListener(PlayerChatEvent::class.java) {
+    handler.addListener(PlayerChatEvent::class.java) {
         val playerName = PlainTextComponentSerializer.plainText().serialize(it.player.name)
         LOGGER.info("<{}> {}", playerName, it.rawMessage)
     }
 
-    eventNode.addListener(ServerListPingEvent::class.java) {
+    handler.addListener(ServerListPingEvent::class.java) {
         val respData = it.responseData
         respData.clearEntries()
         pinger().exceptionHandler {
@@ -182,7 +183,7 @@ fun main(args: Array<String>) {
         }.sync
     }
 
-    eventNode.addListener(PlayerCommandEvent::class.java) {
+    handler.addListener(PlayerCommandEvent::class.java) {
         val playerName = PlainTextComponentSerializer.plainText().serialize(it.player.name)
         LOGGER.info("{}: /{}", playerName, it.command)
     }
@@ -213,7 +214,7 @@ fun main(args: Array<String>) {
 
 fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
     val e = InstanceStartEvent()
-    eventNode.call(e)
+    MinecraftServer.getGlobalEventHandler().call(e)
     if (e.isCancelled) return
 
     LOGGER.info("Starting the server")
@@ -226,7 +227,7 @@ fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () ->
             LOGGER.info("Server is still starting... Current state: $state")
             return@schedule
         }
-        eventNode.call(InstanceStartedEvent())
+        MinecraftServer.getGlobalEventHandler().call(InstanceStartedEvent())
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
         discord.sendMessage(":arrows_counterclockwise: Waiting for the Minecraft server")
@@ -245,10 +246,10 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
             LOGGER.trace("Trying to connect to $hostname:$port")
             LOGGER.trace("Pinger exception", it)
         }.responseHandler {
-            eventNode.call(MinecraftStartedEvent())
+            MinecraftServer.getGlobalEventHandler().call(MinecraftStartedEvent())
             instance.players.forEach { p ->
                 val e = TransferEvent(p)
-                eventNode.call(e)
+                MinecraftServer.getGlobalEventHandler().call(e)
                 if (e.isCancelled) return@forEach
 
                 LOGGER.info {
@@ -265,7 +266,7 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
 
 fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
     val e = InstanceStopEvent()
-    eventNode.call(e)
+    MinecraftServer.getGlobalEventHandler().call(e)
     if (e.isCancelled) return
 
     powerOffTask?.cancel()
@@ -276,7 +277,7 @@ fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
             LOGGER.info("Powering off server")
             discord.sendMessage(":no_entry: Server stopped")
             scaleway.powerOffServer()
-            eventNode.call(InstanceStoppedEvent())
+            MinecraftServer.getGlobalEventHandler().call(InstanceStoppedEvent())
             cancel()
         }
     }
