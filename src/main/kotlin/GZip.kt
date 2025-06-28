@@ -1,4 +1,4 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend
+package world.anhgelus.architectsland.minecraftscalewayfrontend
 
 import java.io.FileInputStream
 import java.io.FileOutputStream

@@ -1,11 +1,11 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend
+package world.anhgelus.architectsland.minecraftscalewayfrontend
 
 import net.lenni0451.mcping.MCPing
 import net.lenni0451.mcping.responses.MCPingResponse
 import net.minestom.server.command.builder.Command
 import net.minestom.server.entity.Player
 import net.minestom.server.network.packet.server.common.TransferPacket
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
+import world.anhgelus.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
 
 class InfoCommand(val scaleway: ScalewayAPI, val pinger: () -> MCPing<MCPingResponse>) : Command("info") {
     init {

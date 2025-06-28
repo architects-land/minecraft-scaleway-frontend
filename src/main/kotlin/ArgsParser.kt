@@ -1,4 +1,4 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend
+package world.anhgelus.architectsland.minecraftscalewayfrontend
 
 import java.nio.file.Files
 import java.nio.file.Path

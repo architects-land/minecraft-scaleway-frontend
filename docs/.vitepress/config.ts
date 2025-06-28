@@ -24,6 +24,14 @@ export default defineConfig({
           { text: 'Advanced configuration', link: '/advanced-configuration' },
           { text: 'Server Stopper', link: '/server-stopper' },
         ]
+      },
+      {
+        text: "Plugin",
+        items: [
+          { text: 'Introduction', link: '/plugin/introduction' },
+          { text: 'Create a plugin', link: '/plugin/create-a-plugin' },
+          { text: 'Events', link: '/plugin/events' },
+        ]
       }
     ],
 

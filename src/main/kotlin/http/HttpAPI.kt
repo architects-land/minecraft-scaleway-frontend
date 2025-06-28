@@ -1,6 +1,6 @@
-package world.anhgelus.world.architectsland.minecraftscalewayfrontend.http
+package world.anhgelus.architectsland.minecraftscalewayfrontend.http
 
-import world.anhgelus.world.architectsland.minecraftscalewayfrontend.LOGGER
+import world.anhgelus.architectsland.minecraftscalewayfrontend.LOGGER
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
