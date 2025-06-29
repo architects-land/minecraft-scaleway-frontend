@@ -70,6 +70,6 @@ Use `--discord-webhook string` to set it.
 
 The server sends a message when:
 - the instance is starting (message: ":arrows_counterclockwise: Starting the server")
-- the instance is started (message: ":arrows_counterclockwise: Waiting for the Minecraft server")
+- the instance is started (message: ":hourglass: Waiting for the Minecraft server")
 - the Minecraft server is started (message: ":white_check_mark: Minecraft server started")
 - the instance is powered off (message: ":no_entry: Server stopped")

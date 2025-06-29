@@ -203,7 +203,7 @@ fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () ->
         }
         LOGGER.info("Server started, waiting for the Minecraft server")
         instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
-        discord.sendMessage(":arrows_counterclockwise: Waiting for the Minecraft server")
+        discord.sendMessage(":hourglass: Waiting for the Minecraft server")
 
         setupServerTransfer(discord, pinger, instance, hostname, port)
         setupServerPowerOff(scaleway, discord)
