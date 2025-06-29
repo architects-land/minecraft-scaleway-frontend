@@ -40,7 +40,7 @@ You can use any OpenJDK distribution supporting Java 21.
 We will create the folder containing and the user running the Minecraft server.
 Run to create a new user `minecraft`
 ```bash
-useradd minecraft
+useradd -M minecraft
 usermod -s /usr/sbin/nologin minecraft
 ```
 You will not be able to connect to this user.
