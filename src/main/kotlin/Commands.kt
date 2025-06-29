@@ -19,7 +19,7 @@ class InfoCommand(val scaleway: ScalewayAPI, val pinger: () -> MCPing<MCPingResp
             pinger().exceptionHandler {
                 sender.sendMessage("$base\nMinecraft server not started yet.")
             }.responseHandler {
-                sender.sendMessage("$base\nMinecraft server is online. Use /connect to connect you.\nThis is a bug, please report it.")
+                sender.sendMessage("$base\nMinecraft server is online. Use /connect to connect you.\nIf the Minecraft server does not crash, this is a bug, please report it.")
             }.sync
         }
     }
@@ -36,7 +36,7 @@ class ConnectCommand(val pinger: () -> MCPing<MCPingResponse>, val hostname: Str
                     sender.sendMessage("You are not a player :(")
                     return@responseHandler
                 }
-                sender.sendPacket(TransferPacket(hostname, port))
+                sender.instance.players.forEach { it.sendPacket(TransferPacket(hostname, port)) }
             }.sync
         }
     }
