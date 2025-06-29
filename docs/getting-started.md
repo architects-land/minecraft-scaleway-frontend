@@ -53,7 +53,7 @@ Start it, stop it and modify `server.properties` to allow server transfer (proto
 to the Minecraft server).
 
 :::tip Automatic installation with anhgelus/cloud-setups
-You can use [anhgelus's cloud-setups](https//github.com/anhgelus/cloud-setups) to perform automatic installation of a
+You can use [anhgelus's cloud-setups](https://github.com/anhgelus/cloud-setups) to perform automatic installation of a
 Minecraft server.
 
 With these, you can easily install Java or a Modrinth modpack for a Rocky Linux.
