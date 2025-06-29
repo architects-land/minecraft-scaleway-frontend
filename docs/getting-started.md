@@ -78,7 +78,7 @@ User=minecraft
 WorkingDirectory=/var/minecraft
 
 # customize the CLI
-ExecStart=bash -c "/usr/bin/java" # command to start the server
+ExecStart=bash -c "/usr/bin/java"
 
 Restart=always
 #RestartSec=30

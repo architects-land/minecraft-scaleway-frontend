@@ -62,12 +62,8 @@ fun main(args: Array<String>) {
     var whitelistEnabled = parser.has("whitelist")
     if (whitelistEnabled) {
         val p = parser.get("whitelist")!!
-        if (p.isEmpty()) {
-            whitelistEnabled = false
-        } else {
-            whitelist = p.split(",")
-            if (whitelist.isEmpty()) whitelistEnabled = false
-        }
+        if (p.isEmpty()) whitelistEnabled = false
+        else whitelist = p.split(",")
     }
 
     TIMER =  Timer()
