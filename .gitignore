@@ -188,3 +188,5 @@ logs
 
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+server-icon.png

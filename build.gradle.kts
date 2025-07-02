@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "world.anhgelus.world.architectsland.minecraftscalewayfrontend"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -20,7 +20,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.25.0")
     implementation("org.apache.logging.log4j:log4j-core:2.25.0")
 
-    implementation("net.minestom:minestom-snapshots:1_21_6-a40d7115d4")
+    implementation("net.minestom:minestom-snapshots:1_21_7-47dfa90aff")
     implementation("net.lenni0451:MCPing:1.4.4")
 }
 

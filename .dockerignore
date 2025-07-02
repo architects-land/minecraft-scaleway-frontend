@@ -190,3 +190,5 @@ logs
 src/main/resources/log4j2-test.xml
 
 docs
+
+server-icon.png
