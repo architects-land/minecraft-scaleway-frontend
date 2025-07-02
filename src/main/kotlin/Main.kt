@@ -21,7 +21,7 @@ import org.apache.logging.log4j.message.ParameterizedMessage
 import sun.misc.Signal
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.DiscordWebhookAPI
 import world.anhgelus.world.architectsland.minecraftscalewayfrontend.http.ScalewayAPI
-import java.io.IOException
+import java.nio.charset.MalformedInputException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -80,9 +80,11 @@ fun main(args: Array<String>) {
     var favicon: String? = null
     val faviconPath = Path.of("server-icon.png")
     if (Files.exists(faviconPath)) {
-        val lines = Files.lines(faviconPath)
-        favicon = lines.collect(Collectors.joining("\n"))
-        lines.close()
+        try {
+            Files.readString(faviconPath, Charsets.UTF_8).let { favicon = it }
+        } catch (_: MalformedInputException) {
+            LOGGER.error("server-icon.png is not an UTF-8 file. Skipping")
+        }
     }
 
     // make server use online mode
@@ -160,7 +162,7 @@ fun main(args: Array<String>) {
             respData.description = Component.text(data.description)
             respData.maxPlayer = data.maxPlayers
             respData.favicon = data.favicon
-            data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.named(p.name)) }
+            data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.of(p.name, UUID.fromString(p.id))) }
         }.sync
     }
 
