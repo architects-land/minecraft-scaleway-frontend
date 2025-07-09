@@ -163,6 +163,7 @@ fun main(args: Array<String>) {
             respData.maxPlayer = data.maxPlayers
             respData.favicon = data.favicon
             data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.of(p.name, UUID.fromString(p.id))) }
+            respData.online = data.players.sample.size
         }.sync
     }
 
