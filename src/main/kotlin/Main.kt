@@ -35,6 +35,7 @@ val LOGGER: Logger = LogManager.getLogger("world.anhgelus.world.architectsland.m
 lateinit var TIMER: Timer
 
 private var powerOffTask: TimerTask? = null
+private var transferTask: TimerTask? = null
 
 fun main(args: Array<String>) {
     LOGGER.info("Minecraft Scaleway Frontend launched")
@@ -120,7 +121,12 @@ fun main(args: Array<String>) {
         pinger().exceptionHandler {
             val state = scaleway.serverState()
             if (state == ScalewayAPI.ServerState.RUNNING || state == ScalewayAPI.ServerState.STARTING) {
-                player.sendMessage(Component.text("The server is already starting..."))
+                if (transferTask != null) {
+                    player.sendMessage(Component.text("The server is already starting..."))
+                } else {
+                    player.sendMessage(Component.text("Waiting for the Minecraft server..."))
+                    setupServerTransfer(discord, pinger, instance, hostname, port)
+                }
                 return@exceptionHandler
             } else if (state == ScalewayAPI.ServerState.LOCKED) {
                 LOGGER.warn("Server locked")
@@ -216,23 +222,28 @@ fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () ->
 }
 
 fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
-    TIMER.schedule(15*1000L, 5*1000L) {
-        pinger().exceptionHandler {
-            LOGGER.info("Assuming that the Minecraft server is still starting...")
-            LOGGER.trace("Trying to connect to $hostname:$port")
-            LOGGER.trace("Pinger exception", it)
-        }.responseHandler {
-            instance.players.forEach {
-                LOGGER.info {
-                    val name = PlainTextComponentSerializer.plainText().serialize(it.name)
-                    ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, it.uuid)
+    transferTask?.cancel()
+    transferTask = object : TimerTask() {
+        override fun run() {
+            pinger().exceptionHandler {
+                LOGGER.info("Assuming that the Minecraft server is still starting...")
+                LOGGER.trace("Trying to connect to $hostname:$port")
+                LOGGER.trace("Pinger exception", it)
+            }.responseHandler {
+                instance.players.forEach {
+                    LOGGER.info {
+                        val name = PlainTextComponentSerializer.plainText().serialize(it.name)
+                        ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, it.uuid)
+                    }
+                    it.sendPacket(TransferPacket(hostname, port))
                 }
-                it.sendPacket(TransferPacket(hostname, port))
-            }
-            discord.sendMessage(":white_check_mark: Minecraft server started")
-            cancel()
-        }.sync
+                discord.sendMessage(":white_check_mark: Minecraft server started")
+                cancel()
+                transferTask = null
+            }.sync
+        }
     }
+    TIMER.schedule(transferTask, 15*1000L, 5*1000L)
 }
 
 fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
