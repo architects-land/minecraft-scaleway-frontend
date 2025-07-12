@@ -20,7 +20,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.25.0")
     implementation("org.apache.logging.log4j:log4j-core:2.25.0")
 
-    implementation("net.minestom:minestom-snapshots:1_21_7-47dfa90aff")
+    implementation("net.minestom:minestom:2025.07.11-1.21.7")
     implementation("net.lenni0451:MCPing:1.4.4")
 }
 

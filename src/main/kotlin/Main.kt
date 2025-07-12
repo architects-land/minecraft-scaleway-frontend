@@ -27,7 +27,6 @@ import java.nio.file.Path
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.stream.Collectors
 import kotlin.concurrent.schedule
 
 val LOGGER: Logger = LogManager.getLogger("world.anhgelus.world.architectsland.minecraftscalewayfrontend")
@@ -152,7 +151,7 @@ fun main(args: Array<String>) {
     }
 
     handler.addListener(ServerListPingEvent::class.java) {
-        val respData = it.responseData
+        val respData = it
         respData.clearEntries()
         pinger().exceptionHandler {
             respData.setPlayersHidden(true)
