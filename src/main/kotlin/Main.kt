@@ -13,6 +13,7 @@ import net.minestom.server.event.server.ServerListPingEvent
 import net.minestom.server.extras.MojangAuth
 import net.minestom.server.instance.InstanceContainer
 import net.minestom.server.network.packet.server.common.TransferPacket
+import net.minestom.server.ping.Status
 import net.minestom.server.utils.identity.NamedAndIdentified
 import net.minestom.server.world.DimensionType
 import org.apache.logging.log4j.LogManager
@@ -151,17 +152,18 @@ fun main(args: Array<String>) {
     }
 
     handler.addListener(ServerListPingEvent::class.java) {
-        val respData = it
-        respData.clearEntries()
-        pinger().exceptionHandler {
-            respData.setPlayersHidden(true)
-            respData.description = Component.text("The server is sleeping. Connect you to wake it up!")
-            if (favicon != null) respData.favicon = favicon
+        val status = Status.builder()
+        pinger().exceptionHandler { _ ->
+            status.playerInfo(MinecraftServer.getConnectionManager().onlinePlayers.size, 20)
+                .description(Component.text("The server is sleeping. Connect you to wake it up!"))
+            if (favicon != null) status.favicon(favicon.encodeToByteArray())
+            it.status = status.build()
         }.responseHandler { data ->
-            respData.description = Component.text(data.description)
-            respData.maxPlayer = data.maxPlayers
-            respData.favicon = data.favicon
-            data.players.sample.forEach { p -> respData.addEntry(NamedAndIdentified.of(p.name, UUID.fromString(p.id))) }
+            status.description(Component.text(data.description))
+                .favicon(data.favicon.encodeToByteArray())
+            val info = Status.PlayerInfo.builder().maxPlayers(data.maxPlayers)
+            data.players.sample.forEach { p -> info.sample(NamedAndIdentified.of(p.name, UUID.fromString(p.id))) }
+            it.status = status.playerInfo(info.build()).build()
         }.sync
     }
 
