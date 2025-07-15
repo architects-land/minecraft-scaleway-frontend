@@ -121,6 +121,7 @@ fun main(args: Array<String>) {
         pinger().exceptionHandler {
             val state = scaleway.serverState()
             if (state == ScalewayAPI.ServerState.RUNNING || state == ScalewayAPI.ServerState.STARTING) {
+                if (powerOffTask == null) setupServerPowerOff(scaleway, discord)
                 if (transferTask != null) {
                     player.sendMessage(Component.text("The server is already starting..."))
                 } else {
