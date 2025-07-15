@@ -101,6 +101,11 @@ restorecon [path]
 where `[path]` is the path of the binary or of the service.
 :::
 
+#### Better way to stop the server
+
+You can stop the Minecraft via the rcon by using [server stopper](/server-stopper).
+If you are using it, add a `ExecStop` running this in the service section of your unit file.
+
 ### Stopping the instance and the Minecraft server if no one is connected
 
 Read [Server Stopper](server-stopper.md).

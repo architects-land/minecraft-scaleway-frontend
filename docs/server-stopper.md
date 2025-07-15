@@ -10,7 +10,7 @@ It requires Java 21, Gradle and Go 1.24+.
 You can upload these to the instance.
 Put the jar in the mod folder (`/var/minecraft/mods`).
 Do not forget to give the permission to the `minecraft` user.
-Put the service jar in `/usr/local/bin`.
+Put the service bin in `/usr/local/bin`.
 
 Download the service unit file provided in GitHub and put it in `/etc/systemd/system/`
 ```bash
@@ -57,3 +57,12 @@ If you want to only stop the Minecraft server and not the instance, you can use 
 only stop Minecraft. (This argument must be used on a systemd Linux distribution.)
 The argument `-minecraft-service string` specifies the name of the service to stop.
 By default, this is `minecraft.service`.
+
+## Stopping the Minecraft server via the rcon
+
+You can stop the Minecraft server via the rcon with Server Stopper.
+The rcon must be enabled in the `server.properties`.
+
+To stop the server, run `service -stop-minecraft -rcon-password [password]` (assuming that `service` is the in your path).
+It will send a `stop` command via the rcon.
+You can customize the port with `-rcon-port [int > 0]` (default: `25575`).
