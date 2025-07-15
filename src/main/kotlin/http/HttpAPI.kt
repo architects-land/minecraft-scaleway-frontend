@@ -16,7 +16,7 @@ abstract class HttpAPI {
         return HttpRequest.newBuilder().uri(URI.create(uri))
     }
 
-    protected fun send(request: HttpRequest): HttpResponse<String>? {
+    protected fun send(request: HttpRequest): HttpResponse<String> {
         var resp : HttpResponse<String>
         try {
             resp = client.send(request, HttpResponse.BodyHandlers.ofString())
