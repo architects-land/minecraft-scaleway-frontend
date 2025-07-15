@@ -145,7 +145,7 @@ You can use the official Docker image `ghcr.io/architects-land/minecraft-scalewa
 Tags:
 - `latest` is always the latest one
 - `main` is for the main branch
-- `v*` is for a specific tag (e.g., `v1.0.0`)
+- `v*` is for a specific tag (e.g., `v1.0.3-1.21.6`)
 
 Required environments:
 - `ZONE` is the instance's zone
@@ -159,7 +159,7 @@ Example `docker-compose.yml`:
 ```yml
 services:
   frontend:
-    image: ghcr.io/architects-land/minecraft-scaleway-frontend:v1.0.0
+    image: ghcr.io/architects-land/minecraft-scaleway-frontend:v1.0.3-1.21.6
     ports:
       - 25565:25565
     environment:
