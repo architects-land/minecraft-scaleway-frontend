@@ -205,21 +205,24 @@ fun startServer(scaleway: ScalewayAPI, discord: DiscordWebhookAPI, pinger: () ->
     instance.players.forEach { it.sendMessage(Component.text("Starting the server for you...")) }
     discord.sendMessage(":arrows_counterclockwise: Starting the server")
     scaleway.startServer()
-    TIMER.schedule(10*1000L, 10*1000L) {
-        val state = scaleway.serverState()
-        if (state != ScalewayAPI.ServerState.RUNNING) {
-            LOGGER.info("Server is still starting... Current state: $state")
-            return@schedule
+    val task = object : TimerTask() {
+        override fun run() {
+            val state = scaleway.serverState()
+            if (state != ScalewayAPI.ServerState.RUNNING) {
+                LOGGER.info("Server is still starting... Current state: $state")
+                return
+            }
+            LOGGER.info("Server started, waiting for the Minecraft server")
+            instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
+            discord.sendMessage(":hourglass: Waiting for the Minecraft server")
+
+            setupServerTransfer(discord, pinger, instance, hostname, port)
+            setupServerPowerOff(scaleway, discord)
+
+            this.cancel()
         }
-        LOGGER.info("Server started, waiting for the Minecraft server")
-        instance.players.forEach { it.sendMessage(Component.text("Waiting for the Minecraft server...")) }
-        discord.sendMessage(":hourglass: Waiting for the Minecraft server")
-
-        setupServerTransfer(discord, pinger, instance, hostname, port)
-        setupServerPowerOff(scaleway, discord)
-
-        cancel()
     }
+    TIMER.schedule(task, 10*1000L, 10*1000L)
 }
 
 fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingResponse>, instance: InstanceContainer, hostname: String, port: Int) {
@@ -239,7 +242,7 @@ fun setupServerTransfer(discord: DiscordWebhookAPI, pinger: () -> MCPing<MCPingR
                     it.sendPacket(TransferPacket(hostname, port))
                 }
                 discord.sendMessage(":white_check_mark: Minecraft server started")
-                cancel()
+                this.cancel()
                 transferTask = null
             }.sync
         }
@@ -256,7 +259,7 @@ fun setupServerPowerOff(scaleway: ScalewayAPI, discord: DiscordWebhookAPI) {
             LOGGER.info("Powering off server")
             discord.sendMessage(":no_entry: Server stopped")
             scaleway.powerOffServer()
-            cancel()
+            this.cancel()
         }
     }
     TIMER.schedule(powerOffTask, 2*60*1000L, 30*1000L)
