@@ -138,6 +138,7 @@ fun main(args: Array<String>) {
             }
             startServer(scaleway, discord, pinger, instance, hostname, port)
         }.responseHandler {
+            if (powerOffTask == null) setupServerPowerOff(scaleway, discord)
             LOGGER.info {
                 val name = PlainTextComponentSerializer.plainText().serialize(event.player.name)
                 ParameterizedMessage("Sending player {} ({}) to the Minecraft server", name, player.uuid)
